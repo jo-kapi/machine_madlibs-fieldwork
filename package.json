@@ -1,6 +1,6 @@
 {
   "name": "machine-madlibs-fieldwork",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Machine Madlibs: workshop activities with a local LLM, adapted for field:work",
   "private": true,
   "type": "module",
