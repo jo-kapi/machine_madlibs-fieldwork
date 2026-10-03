@@ -10,7 +10,7 @@
       "filler": "Used when the theme is left blank: little words like “the” and “of”."
     },
     "color": {
-      "hex": "Turns a colour you describe, like “burnt orange”, into a hex code."
+      "hex": "Turns a color you describe, like “burnt orange”, into a hex code."
     },
     "temp": {
       "sample": "Asked many times each round, to see how much the machine's answers vary."

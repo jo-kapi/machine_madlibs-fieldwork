@@ -114,6 +114,16 @@
   overflow-y: auto;
 }
 
+/* The version, in a quiet strip at the foot of the sheet. */
+.peek__footer {
+  margin: 0;
+  padding: var(--space-md) var(--space-lg);
+  border-top: solid thin var(--color-border);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
 .peek__status {
   margin: 0;
   color: var(--color-text-muted);

@@ -3,7 +3,7 @@
    native <dialog> elements, so the page behind is inert and Esc closes them. */
 
 /* THE SCRIM
-   Every dialog dims the page behind it with a scrim in the page's own colour, so it
+   Every dialog dims the page behind it with a scrim in the page's own color, so it
    follows the light or dark setting. The values are written out because older browsers
    don't pass custom properties (the tokens) on to ::backdrop: keep them in step with
    --color-bg in tokens.css. */

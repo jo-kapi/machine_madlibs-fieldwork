@@ -79,7 +79,7 @@ export const PROMPTS = {
 
   color: {
     hex: {
-      label: "Visual poetry: colour",
+      label: "Visual poetry: color",
       system:
         "You are a helpful design assistant. " +
         "Based on the description provided, you are to ONLY respond with the appropriate RGB hexcode that best matches the provided description. " +

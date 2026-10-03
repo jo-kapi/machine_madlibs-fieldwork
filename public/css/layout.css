@@ -55,7 +55,7 @@ main {
 
 /* HEADER
    The site title, the activity links and the help button. Three columns: the two
-   outer ones are equal, so the links stay centred on the page whatever the widths of
+   outer ones are equal, so the links stay centered on the page whatever the widths of
    the title and the buttons are. */
 .site-header {
   display: grid;
@@ -83,7 +83,7 @@ main {
     letter-spacing: -0.01em;
 
     /* Below about this width the title and the links no longer fit side by side with
-       the links centred, so the event name moves under the title. */
+       the links centered, so the event name moves under the title. */
     @media (max-width: 900px) {
       flex-direction: column;
       align-items: flex-start;
@@ -112,7 +112,7 @@ main {
   grid-column: 2;
   gap: var(--space-md);
 
-  /* Small tablets are tight: the title needs the room to stay beside the centred links. */
+  /* Small tablets are tight: the title needs the room to stay beside the centered links. */
   @media (max-width: 900px) {
     gap: var(--space-sm);
   }

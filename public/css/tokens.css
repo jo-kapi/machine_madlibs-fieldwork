@@ -27,7 +27,7 @@
   /* Follow the device's light or dark setting (native controls and scrollbars too). */
   color-scheme: light dark;
 
-  /* Colour: light scheme. The dark values are further down. */
+  /* Color: light scheme. The dark values are further down. */
   --color-bg: #fff;
   --color-surface: #f5f5f5;
   --color-surface-hover: #e8e8e8;
@@ -39,9 +39,9 @@
   --color-invert-bg: #000;
   --color-invert-text: #fff;
 
-  /* The field:work accent is a fill, not a text colour: it is too light to read on
+  /* The field:work accent is a fill, not a text color: it is too light to read on
      white. Put --color-on-accent on top of it. Use --color-accent-text when the
-     accent has to be the colour of text or a thin line. */
+     accent has to be the color of text or a thin line. */
   --color-accent: #d5d12f;
   --color-on-accent: #000;
   --color-accent-soft: #f5f4cb;

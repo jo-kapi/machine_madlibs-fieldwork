@@ -3,6 +3,8 @@
 const form = document.querySelector(".join__form");
 const submit = form.querySelector(".join__submit");
 
+MM.showVersion(document.querySelector(".join__version"));
+
 // Only follow same-site paths, so the link can't send people elsewhere.
 function destination() {
   const next = new URLSearchParams(location.search).get("next");

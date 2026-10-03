@@ -12,7 +12,7 @@ Everything runs on one computer. The language model runs locally through [Ollama
 | **02 Visual Poetry**  | Ask for words on a theme, drag them around a canvas, style them (colours can be described in plain language), then download the image or send it to the shared screen.                                                                                                                                                              |
 | **03 Temp Check**     | Everyone types one word to complete a sentence while the machine does the same 20 times. Play to match the machine, or to beat it, and watch what raising the temperature does. At high temperatures the machine sometimes produces garbled text; the app filters it out and the host screen says how many replies were thrown out. |
 
-Every page has a **Peek at the system prompt** button that slides in a sheet showing the real instructions and settings the machine is given, with a plain-language note on what each part does.
+Every page has a **Peek at the system prompt** button that slides in a sheet showing the real instructions and settings the machine is given, with a plain-language note on what each part does. It also shows the app's version, which comes from `version` in `package.json`.
 
 ---
 

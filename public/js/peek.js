@@ -48,8 +48,11 @@ const Peek = (() => {
     const header = MM.el("header", "peek__header");
     header.append(heading, close);
     bodyElement = MM.el("div", "peek__body");
+    const footer = MM.el("p", "peek__footer");
+    footer.hidden = true; // until the version is known
+    MM.showVersion(footer);
     const sheet = MM.el("div", "peek__sheet");
-    sheet.append(header, bodyElement);
+    sheet.append(header, bodyElement, footer);
     dialog.append(sheet);
 
     // Esc and a click on the dimmed area both close it, with the slide-out.
@@ -109,11 +112,11 @@ const Peek = (() => {
   // the part of it that this prompt is for.
   function splitLabel(label) {
     const [group, ...rest] = label.split(": ");
-    if (rest.length === 0) return { group: "", name: capitalise(label) };
-    return { group, name: capitalise(rest.join(": ")) };
+    if (rest.length === 0) return { group: "", name: capitalize(label) };
+    return { group, name: capitalize(rest.join(": ")) };
   }
 
-  function capitalise(text) {
+  function capitalize(text) {
     return text.charAt(0).toUpperCase() + text.slice(1);
   }
 

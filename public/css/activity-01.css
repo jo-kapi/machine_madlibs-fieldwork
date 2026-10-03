@@ -316,29 +316,6 @@
   max-width: var(--column);
   height: 3rem;
 
-  /* Inputs under 16px make iOS zoom the page when they are focused. */
-  font-size: 16px;
-
-  & input {
-    height: 100%;
-    padding-inline: var(--space-md);
-    border: solid thin var(--color-border-strong);
-    border-radius: var(--radius-pill);
-    background: var(--color-bg);
-    color: var(--color-text);
-    transition: border-color var(--transition);
-
-    /* The border is the only focus indicator, so there is no second ring. */
-    &:focus {
-      outline: none;
-      border-color: var(--color-text);
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-    }
-  }
-
   &.prompt--disabled {
     opacity: 0.5;
   }

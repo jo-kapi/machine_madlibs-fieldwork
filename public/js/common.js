@@ -32,6 +32,19 @@ const MM = (() => {
     return data;
   }
 
+  // Fills `element` with "Version 2.1.1", read from package.json by the server. The
+  // element stays hidden if the version can't be read.
+  let versionRequest = null; // asked for once, then reused
+  async function showVersion(element) {
+    versionRequest ??= api("config")
+      .then((config) => config.version || "")
+      .catch(() => "");
+    const version = await versionRequest;
+    if (!version) return;
+    element.textContent = `Version ${version}`;
+    element.hidden = false;
+  }
+
   // ---------- identity ----------
   // Name and optional pronouns are asked for once, then kept in this browser.
 
@@ -186,6 +199,7 @@ const MM = (() => {
 
   return {
     api,
+    showVersion,
     getIdentity,
     joinSession,
     requireIdentity,

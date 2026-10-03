@@ -1,9 +1,23 @@
 // Settings come from environment variables, optionally loaded from a .env file.
 // Copy .env.example to .env to change them without touching the command line.
+import fs from "node:fs";
+import path from "node:path";
+import { rootDir } from "./paths.js";
+
 try {
   process.loadEnvFile();
 } catch {
   // No .env file; defaults and real environment variables are used.
+}
+
+// The app's version comes from package.json, so it is set in one place.
+function readVersion() {
+  try {
+    const file = path.join(rootDir, "package.json");
+    return JSON.parse(fs.readFileSync(file, "utf8")).version ?? "";
+  } catch {
+    return "";
+  }
 }
 
 function int(name, fallback) {
@@ -12,6 +26,7 @@ function int(name, fallback) {
 }
 
 export const config = {
+  version: readVersion(),
   port: int("PORT", 3000),
   // Ollama model for Activities 1 and 2: writing, poetry and colours.
   model: process.env.MODEL || "mistral-small:24b",

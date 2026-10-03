@@ -157,12 +157,12 @@ export async function poet({ theme, signal }) {
 }
 
 export async function color({ description, signal }) {
-  const input = shortText(description ?? "", "Colour description");
-  if (!input) throw new InputError("Describe a colour first.");
+  const input = shortText(description ?? "", "Color description");
+  if (!input) throw new InputError("Describe a color first.");
   const { system, options } = PROMPTS.color.hex;
   const { text } = await chat({ system, user: input, options, signal });
   const hex = parseHex(text);
   if (!hex)
-    throw new OllamaError("Couldn't read a colour from the reply. Try again.", 502);
+    throw new OllamaError("Couldn't read a color from the reply. Try again.", 502);
   return { hex };
 }

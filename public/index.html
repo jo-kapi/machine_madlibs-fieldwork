@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="css/normalize.css" />
     <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/buttons.css" />
+    <link rel="stylesheet" href="css/forms.css" />
     <link rel="stylesheet" href="css/join.css" />
   </head>
   <body>
@@ -16,7 +18,7 @@
     <main class="join">
       <form class="join__form" novalidate>
         <h2 class="join__title">Welcome</h2>
-        <p>
+        <p class="join__intro">
           Tell us who you are. Your name appears on the shared screen next to anything you
           send to it.
         </p>
@@ -24,6 +26,7 @@
         <label class="join__field">
           <span class="join__label">Name</span>
           <input
+            class="input"
             type="text"
             name="name"
             maxlength="40"
@@ -36,6 +39,7 @@
         <label class="join__field">
           <span class="join__label">Pronouns <small>(optional)</small></span>
           <input
+            class="input"
             type="text"
             name="pronouns"
             maxlength="30"
@@ -48,9 +52,12 @@
           beside your name on the shared screen, never on the leaderboard.
         </p>
 
-        <button type="submit" class="join__submit">Join</button>
+        <button type="submit" class="btn btn--primary btn--large join__submit">
+          Join
+        </button>
         <p class="notice" role="status" hidden></p>
       </form>
+      <p class="join__version" hidden></p>
     </main>
     <script src="js/common.js"></script>
     <script src="js/join.js"></script>

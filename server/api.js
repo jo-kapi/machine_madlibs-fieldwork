@@ -61,7 +61,7 @@ export function createApiRouter({ game, gallery }) {
 
   // Settings the pages need.
   router.get("/config", (req, res) => {
-    res.json({ googleFormUrl: config.googleFormUrl });
+    res.json({ googleFormUrl: config.googleFormUrl, version: config.version });
   });
 
   router.get("/health", async (req, res) => {

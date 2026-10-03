@@ -1,0 +1,29 @@
+/* FORM FIELDS
+   .input is the pill-shaped text field used for the main thing you type on a page. */
+.input {
+  min-height: 3rem;
+  padding-inline: var(--space-md);
+  border: solid thin var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg);
+  color: var(--color-text);
+
+  /* Fields under 16px make iOS zoom the page when they are focused. */
+  font-size: 16px;
+
+  transition: border-color var(--transition);
+
+  &::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  /* The border is the only focus indicator, so there is no second ring. */
+  &:focus {
+    outline: none;
+    border-color: var(--color-text);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
