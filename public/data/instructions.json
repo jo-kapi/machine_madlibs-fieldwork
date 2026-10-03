@@ -13,14 +13,16 @@
   },
   "activity-02": {
     "title": "Activity 02 · Visual Poetry",
-    "intro": "Turn words from the machine into a visual poem.",
+    "intro": "Move from storytelling to text arrangement. Build compositions from machine-generated words that are as much about rhythm and layout as they are about language. Don’t aim for a finished poem. Stay curious and see what the arrangement says.",
     "steps": [
-      "Type a theme and press Generate Words. Leave it blank for small words like “the” and “of”.",
-      "Click a word to put it on the canvas. Click it again to take it off.",
-      "Drag words around. Select one on the canvas to change its color, tile color, size or font.",
-      "For colors, type a hex code like #ff3b5b, or describe one (“burnt orange”) and the machine will choose.",
-      "Download your poem, or press Send to screen to show it to the room."
-    ]
+      "Start with a phrase. A feeling, an object, a question, or something from earlier. Generate again for more; they pile up.",
+      "Place your words. Click one to put it on the canvas and drag it around. Click it again, or press Remove, to take it off.",
+      "Let the layout do the talking. Scale, color, space, and placement are your expressive tools. Select a word to change them.",
+      "Describe your colors. Tap the dot to pick one, type a hex code, or say it in words (“burnt orange”) and the machine will choose.",
+      "Fill the gaps. Leave the phrase blank for filler words like “the” and “of” when your poem needs some glue.",
+      "Share it. Download your poem, or press Send to screen to show it to the room. Your name goes with it, and you can send more than one. Refresh the page to start again."
+    ],
+    "note": "You may want to go fullscreen to work more comfortably."
   },
   "activity-03": {
     "title": "Activity 03 · Temp Check",

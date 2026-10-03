@@ -60,6 +60,10 @@ main {
 .site-header {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
+
+  /* The row is always as tall as a button, so the line under the header sits in the
+     same place on every page, including the join page, which has no links or buttons. */
+  grid-template-rows: minmax(var(--control-height), auto);
   align-items: center;
   gap: var(--space-sm) var(--space-lg);
 
@@ -119,7 +123,10 @@ main {
 }
 
 .site-nav__link {
-  padding: 0.5em 1em;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height);
+  padding-inline: 1em;
   border: solid thin transparent;
   border-radius: var(--radius-pill);
 
@@ -177,9 +184,44 @@ main {
     display: none;
   }
 
+  /* Floats over the bottom of the nearest positioned parent instead of taking space in
+     the layout, for pages where a message must not move anything. */
+  &.notice--toast {
+    position: absolute;
+    bottom: var(--space-md);
+    left: 50%;
+    z-index: 1;
+    width: max-content;
+    max-width: calc(100% - 2 * var(--space-md));
+    translate: -50% 0;
+    border-color: var(--color-border-strong);
+    background: var(--color-bg);
+    text-align: center;
+    pointer-events: none;
+    animation: notice-in var(--transition) var(--ease-out);
+
+    /* People who prefer less motion get the fade, not the rise. */
+    @media (prefers-reduced-motion: reduce) {
+      animation-name: notice-fade;
+    }
+  }
+
   &.notice--error {
     background: var(--color-error-soft);
     border-color: var(--color-error);
     color: var(--color-error);
+  }
+}
+
+@keyframes notice-in {
+  from {
+    opacity: 0;
+    translate: -50% 0.5rem;
+  }
+}
+
+@keyframes notice-fade {
+  from {
+    opacity: 0;
   }
 }

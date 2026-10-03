@@ -149,7 +149,7 @@ function modeBadge(round) {
 
 function temperatureGauge() {
   const gauge = MM.el("div", "gauge");
-  const label = MM.el("p", "gauge__label");
+  const label = MM.el("p", "gauge__label label");
   label.append("Temperature ", (refs.temperature = MM.el("strong")));
   const track = MM.el("div", "gauge__track");
   refs.marker = MM.el("div", "gauge__marker");
@@ -197,7 +197,10 @@ function buildVoting() {
 
   const buttons = MM.el("div", "vote");
   for (const direction of ["cold", "hot"]) {
-    const button = MM.el("button", `vote__button vote__button--${direction}`);
+    const button = MM.el(
+      "button",
+      `btn btn--large vote__button vote__button--${direction}`
+    );
     button.type = "button";
     button.textContent = direction === "hot" ? "Hotter ▲" : "Colder ▼";
     button.addEventListener("click", () => vote(direction));
@@ -243,7 +246,7 @@ function buildInput() {
   track.append(refs.bar);
 
   const form = MM.el("form", "answer");
-  refs.input = MM.el("input", "answer__input");
+  refs.input = MM.el("input", "input answer__input");
   refs.input.type = "text";
   refs.input.maxLength = 30;
   refs.input.autocomplete = "off";
@@ -251,7 +254,7 @@ function buildInput() {
   refs.input.spellcheck = false;
   refs.input.setAttribute("aria-label", "Your word");
   refs.input.setAttribute("enterkeyhint", "send");
-  const button = MM.el("button", "answer__button", "Lock in");
+  const button = MM.el("button", "btn btn--primary btn--large", "Lock in");
   button.type = "submit";
   form.append(refs.input, button);
   form.addEventListener("submit", (event) => {
@@ -290,10 +293,9 @@ async function submitAnswer() {
 }
 
 function buildThinking() {
-  stage.append(
-    MM.el("h2", "temp__title thinking", "The machine is thinking…"),
-    stemElement(view.round.stem)
-  );
+  const title = MM.el("h2", "temp__title", "The machine is thinking");
+  title.append(" ", MM.dots());
+  stage.append(title, stemElement(view.round.stem));
 }
 
 function buildReveal() {

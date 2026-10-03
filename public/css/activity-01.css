@@ -117,50 +117,9 @@
   }
 }
 
-/* THINKING: three dots that bounce in turn while the machine writes. */
+/* THINKING: the shared .dots, in the quiet text color. */
 .story__dots {
   color: var(--color-text-muted);
-}
-
-/* Inline blocks sit on the text baseline, like full stops. */
-.story__dot {
-  display: inline-block;
-  width: 0.3em;
-  height: 0.3em;
-  border-radius: 50%;
-  background: currentColor;
-  animation: story-bounce 1.2s ease-in-out infinite;
-
-  & + & {
-    margin-left: 0.3em;
-  }
-
-  &:nth-child(2) {
-    animation-delay: 0.15s;
-  }
-
-  &:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-
-  /* Still dots are enough for people who prefer less motion. */
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@keyframes story-bounce {
-  0%,
-  60%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.4;
-  }
-
-  30% {
-    transform: translateY(-0.5em);
-    opacity: 1;
-  }
 }
 
 /* The wild card that went with a sentence, under it: its words as small chips, with the
@@ -251,14 +210,6 @@
   }
 }
 
-.wildcard__label {
-  color: var(--color-text-muted);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 /* The card's five words and phrases, as chips. */
 .wildcard__words {
   display: flex;
@@ -314,7 +265,7 @@
   gap: var(--space-sm);
   width: 100%;
   max-width: var(--column);
-  height: 3rem;
+  height: var(--control-height-large);
 
   &.prompt--disabled {
     opacity: 0.5;

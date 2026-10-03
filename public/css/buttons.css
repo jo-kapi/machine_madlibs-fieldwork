@@ -3,13 +3,15 @@
      .btn--primary  the main action on a page, filled with the accent
      .btn--icon     round, holding one symbol such as ?, ↑ or ✱
      .btn--large    the taller size used in the prompt bar
+     .btn--small    a compact size for secondary actions beside a heading
      .btn--close    a small, quiet round button for closing a card or sheet */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  min-height: 2.4rem;
+  min-height: var(--control-height);
   padding-inline: var(--space-md);
   border: solid thin var(--color-border-strong);
   border-radius: var(--radius-pill);
@@ -48,15 +50,42 @@
   }
 
   &.btn--icon {
-    width: 2.4rem;
+    width: var(--control-height);
     padding: 0;
   }
 
+  &.btn--small {
+    min-height: 2rem;
+    padding-inline: 0.8rem;
+    font-size: var(--text-sm);
+  }
+
   &.btn--large {
-    min-height: 3rem;
+    min-height: var(--control-height-large);
 
     &.btn--icon {
-      width: 3rem;
+      width: var(--control-height-large);
+    }
+  }
+
+  /* Waiting for the machine (see MM.setBusy): dots in place of the label. The label stays
+     in the page, invisible, so the button doesn't change width. */
+  &[aria-busy="true"] {
+    color: transparent;
+    opacity: 1;
+    cursor: progress;
+
+    & .dots {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text);
+    }
+
+    &.btn--primary .dots {
+      color: var(--color-on-accent);
     }
   }
 
@@ -74,5 +103,49 @@
       background: var(--color-surface-hover);
       color: var(--color-text);
     }
+  }
+}
+
+/* DOTS
+   Three dots that bounce in turn while the machine works: in a busy button, and in
+   Activity 01 while the machine writes. They take the color of the text around them. */
+/* Inline blocks sit on the text baseline, like full stops. */
+.dots__dot {
+  display: inline-block;
+  width: 0.3em;
+  height: 0.3em;
+  border-radius: 50%;
+  background: currentColor;
+  animation: dots-bounce 1.2s ease-in-out infinite;
+
+  & + & {
+    margin-left: 0.3em;
+  }
+
+  &:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  /* Still dots are enough for people who prefer less motion. */
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes dots-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+
+  30% {
+    transform: translateY(-0.5em);
+    opacity: 1;
   }
 }

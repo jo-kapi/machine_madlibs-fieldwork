@@ -108,6 +108,35 @@ const MM = (() => {
     if (element) element.hidden = true;
   }
 
+  // ---------- waiting ----------
+
+  // Three dots that bounce in turn (the .dots styles are in buttons.css). Pass a label
+  // when the dots stand alone, so screen readers can say what is going on.
+  function dots(label) {
+    const element = el("span", "dots");
+    if (label) {
+      element.setAttribute("role", "img");
+      element.setAttribute("aria-label", label);
+    } else {
+      element.setAttribute("aria-hidden", "true");
+    }
+    for (let i = 0; i < 3; i++) element.append(el("span", "dots__dot"));
+    return element;
+  }
+
+  // Puts a button into or out of its waiting state: disabled, with dots in place of
+  // its label.
+  function setBusy(button, isBusy) {
+    button.disabled = isBusy;
+    if (isBusy) {
+      button.setAttribute("aria-busy", "true");
+      if (!button.querySelector(".dots")) button.append(dots());
+    } else {
+      button.removeAttribute("aria-busy");
+      button.querySelector(".dots")?.remove();
+    }
+  }
+
   // ---------- dialogs ----------
 
   // Closes a <dialog> after its fade-out has played. Adding "dialog--closing" starts the
@@ -205,6 +234,8 @@ const MM = (() => {
     requireIdentity,
     notice,
     clearNotice,
+    dots,
+    setBusy,
     closeDialog,
     confirm: confirmDialog,
     timestamp,

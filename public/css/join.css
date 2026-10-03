@@ -42,20 +42,6 @@
   gap: var(--space-sm);
 }
 
-.join__label {
-  color: var(--color-text-muted);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-
-  & small {
-    font-size: inherit;
-    letter-spacing: 0;
-    text-transform: none;
-  }
-}
-
 .join__note {
   color: var(--color-text-muted);
   font-size: var(--text-sm);

@@ -1,5 +1,5 @@
 /* DESIGN TOKENS
-   Every colour, font and size used by the app comes from this file,
+   Every color, font and size used by the app comes from this file,
    so re-theming means editing the values below and nothing else. */
 
 /* BRAND FONTS
@@ -48,9 +48,14 @@
   --color-accent-border: #9b971f;
   --color-accent-text: #6b6800;
 
+  /* Visual Poetry canvas: the same in light and dark, so saved images and the sent
+     poem don't depend on the device setting. */
+  --color-canvas: #e6e6e6;
+  --color-on-canvas: #6b6b6b; /* hints written on top of it */
   --color-selection: #ff3b5b; /* outline of the selected tile on the canvas */
-  --color-hot: #e8452c; /* Temp Check: high temperature */
-  --color-cold: #2f6fdd; /* Temp Check: low temperature */
+  --color-hot: #bf4949; /* Temp Check: high temperature */
+  --color-cold: #1a73ad; /* Temp Check: low temperature */
+  --color-on-temperature: #fff; /* text on top of hot and cold */
   --color-error: #b3261e;
   --color-error-soft: #fdecea;
 
@@ -76,6 +81,7 @@
   --text-md: 1rem;
   --text-lg: 1.25rem;
   --text-xl: 1.6rem; /* the story */
+  --text-display: 3rem; /* big numbers: the countdown and the points */
   --leading-prose: 1.55;
 
   /* Shape and spacing.
@@ -88,6 +94,8 @@
   --space-md: 1rem;
   --space-lg: 1.5rem;
   --space-xl: 2.5rem;
+  --control-height: 2.4rem; /* buttons, nav links and the header row */
+  --control-height-large: 3rem; /* the prompt bar and form fields */
   --transition: 250ms;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1); /* quick start, soft landing */
 
@@ -106,6 +114,10 @@
     --color-accent-soft: #313018;
     --color-accent-border: #d5d12f;
     --color-accent-text: #d5d12f;
+
+    --color-hot: #e57373;
+    --color-cold: #4a9fd4;
+    --color-on-temperature: #000;
 
     --color-error: #ff9189;
     --color-error-soft: #3b1714;

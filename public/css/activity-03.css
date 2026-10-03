@@ -1,5 +1,5 @@
 /* TEMP CHECK: PLAYER PAGE
-   A single centred column. It has no fixed widths, so it fits whatever device
+   A single centered column. It has no fixed widths, so it fits whatever device
    is used. */
 
 .temp {
@@ -19,13 +19,16 @@
   margin: 0;
   color: var(--color-text-muted);
   font-family: var(--font-mono);
+  font-size: var(--text-sm);
 }
 
+/* One card holds whichever screen the game is on. */
 .temp__stage {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
   padding: var(--space-lg);
+  border: solid thin var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
 
@@ -36,12 +39,15 @@
 }
 
 .temp__title {
-  font-size: 1.75rem;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 .temp__text {
-  font-size: 1.1rem;
-  line-height: 1.5;
+  color: var(--color-text-soft);
+  line-height: var(--leading-prose);
 }
 
 .temp__muted {
@@ -50,53 +56,50 @@
 
 .temp__link {
   color: var(--color-accent-text);
-  font-size: 1.1rem;
-}
-
-/* Ellipsis that pulses while the machine works. */
-.thinking {
-  animation: pulse 1.2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  50% {
-    opacity: 0.35;
-  }
+  font-size: var(--text-lg);
 }
 
 /* MODE AND STEM */
 .mode {
   align-self: flex-start;
-  padding: 0.25em 0.75em;
+  padding: 0.25em 0.9em;
+  border: solid thin transparent;
   border-radius: var(--radius-pill);
   font-family: var(--font-mono);
-  font-weight: 500;
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 
   &.mode--match {
+    border-color: var(--color-accent);
     background: var(--color-accent-soft);
-    color: var(--color-accent-text);
+    color: var(--color-text);
   }
 
   &.mode--beat {
+    border-color: var(--color-invert-bg);
     background: var(--color-invert-bg);
     color: var(--color-invert-text);
   }
 }
 
 .stem {
-  font-size: 1.75rem;
+  font-size: var(--text-xl);
   line-height: 1.4;
 }
 
 .stem__blank {
   display: inline-block;
   min-width: 4ch;
-  border-bottom: 3px solid var(--color-text);
+  border-bottom: 2px solid var(--color-text);
 }
 
 /* TEMPERATURE GAUGE */
 .gauge__label {
-  font-family: var(--font-mono);
+  & strong {
+    color: var(--color-text);
+    font-weight: 500;
+  }
 }
 
 /* A cold-to-hot track with a marker at the current temperature. */
@@ -113,6 +116,7 @@
   );
 }
 
+/* The ring in the card's color keeps the marker clear of the gradient. */
 .gauge__marker {
   position: absolute;
   top: -0.3rem;
@@ -120,14 +124,15 @@
   height: 1.35rem;
   border-radius: var(--radius-pill);
   background: var(--color-text);
+  box-shadow: 0 0 0 2px var(--color-surface);
   transform: translateX(-50%);
-  transition: left var(--transition);
+  transition: left var(--transition) var(--ease-out);
 }
 
 /* COUNTDOWN AND ANSWER */
 .countdown {
   font-family: var(--font-mono);
-  font-size: 3rem;
+  font-size: var(--text-display);
   font-weight: 500;
   line-height: 1;
 }
@@ -141,9 +146,10 @@
 
 .countdown__bar {
   height: 100%;
-  background: var(--color-invert-bg);
+  background: var(--color-accent);
 }
 
+/* The field and the Lock in button are the shared .input and .btn. */
 .answer {
   display: flex;
   gap: var(--space-sm);
@@ -152,23 +158,11 @@
 .answer__input {
   flex: 1;
   min-width: 0;
-  padding: 0.9rem;
-  border: 2px solid var(--color-border-strong);
-  border-radius: var(--radius-sm);
-  font-size: 1.5rem;
+  font-size: var(--text-lg);
 }
 
-.answer__button {
-  padding: 0 1.25rem;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: var(--color-invert-bg);
-  color: var(--color-invert-text);
-  font-size: 1.1rem;
-  cursor: pointer;
-}
-
-/* HOT AND COLD (finale) */
+/* HOT AND COLD (finale)
+   Big pills, easy to hit again and again. */
 .vote {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -176,19 +170,26 @@
 }
 
 .vote__button {
-  padding: 1.25rem;
-  border: none;
-  border-radius: var(--radius-md);
-  color: var(--color-invert-text);
-  font-size: 1.25rem;
-  cursor: pointer;
+  min-height: 4rem;
+  font-size: var(--text-lg);
 
   &.vote__button--hot {
-    background: var(--color-hot);
+    --vote-color: var(--color-hot);
   }
 
   &.vote__button--cold {
-    background: var(--color-cold);
+    --vote-color: var(--color-cold);
+  }
+
+  &,
+  &:hover:not(:disabled) {
+    border-color: var(--vote-color);
+    background: var(--vote-color);
+    color: var(--color-on-temperature);
+  }
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
   }
 
   &:active {
@@ -207,6 +208,7 @@
   height: 1rem;
   border-radius: 50%;
   background: var(--color-surface-hover);
+  transition: background var(--transition);
 
   &.pips__pip--on {
     background: var(--color-text);
@@ -224,7 +226,7 @@
 /* RESULTS */
 .points {
   font-family: var(--font-mono);
-  font-size: 3.5rem;
+  font-size: var(--text-display);
   font-weight: 500;
   line-height: 1;
 }
@@ -232,24 +234,25 @@
 .board {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: var(--space-xs);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* Your own row is outlined in the accent, like the current page in the nav. */
 .board__row {
   display: grid;
   grid-template-columns: 2rem 1fr auto;
   gap: var(--space-sm);
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-sm) 0.75rem;
+  border: solid thin transparent;
   border-radius: var(--radius-sm);
   background: var(--color-bg);
-  font-size: 1.1rem;
 
   &.board__row--you {
+    border-color: var(--color-accent);
     background: var(--color-accent-soft);
-    outline: 2px solid var(--color-accent-border);
   }
 }
 

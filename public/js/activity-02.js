@@ -5,8 +5,11 @@ let saveButton,
   canvasBgForm,
   textColorForm,
   textBgForm,
-  fontSizeBtns,
-  fontToggle;
+  editor,
+  removeButton,
+  canvasHint,
+  sizeButtons,
+  fontButtons;
 
 // Initialize the app
 function init() {
@@ -22,11 +25,15 @@ function init() {
   canvasBgForm = document.querySelector("#form-canvas-bg");
   textColorForm = document.querySelector("#form-text-fg");
   textBgForm = document.querySelector("#form-text-bg");
-  fontSizeBtns = Array.from(document.querySelectorAll(".font-sizes .size"));
-  fontToggle = document.querySelector(".font-toggle");
+  editor = document.querySelector(".editor");
+  removeButton = document.querySelector(".editor__remove");
+  canvasHint = document.querySelector(".preview__hint");
+  sizeButtons = Array.from(document.querySelectorAll("[data-size]"));
+  fontButtons = Array.from(document.querySelectorAll("[data-font]"));
 
   // Set up event listeners
   setupEventListeners();
+  updateCanvasHint();
 }
 
 // Set up all event listeners
@@ -41,19 +48,25 @@ function setupEventListeners() {
   textColorForm.addEventListener("submit", handleTextColorSubmit);
   textBgForm.addEventListener("submit", handleTextBgSubmit);
 
-  // Font size buttons
-  fontSizeBtns.forEach((btn) => {
-    btn.addEventListener("click", handleFontSizeClick);
-  });
+  // Size and font choices
+  sizeButtons.forEach((button) => button.addEventListener("click", handleSizeClick));
+  fontButtons.forEach((button) => button.addEventListener("click", handleFontClick));
 
-  // Font toggle button
-  fontToggle.addEventListener("click", handleFontToggle);
+  // Taking the selected word off the canvas
+  removeButton.addEventListener("click", handleRemoveClick);
+  document.addEventListener("keydown", handleKeydown);
+
+  // The dots in the color fields are color pickers.
+  setupPicker("#canvas-bg", false, (hex) => (sketchBg = hex));
+  setupPicker("#text-fg", true, (hex, tile) => (tile.c = hex));
+  setupPicker("#text-bg", true, (hex, tile) => (tile.bg = hex));
 }
 
-// Runs a request with the form's button disabled. Errors are shown on the page.
+// Runs a request while the form's button shows that the machine is working. Errors
+// are shown on the page.
 async function runBusy(form, task) {
   const button = form.querySelector("button");
-  button.disabled = true;
+  MM.setBusy(button, true);
   form.setAttribute("aria-busy", "true");
   MM.clearNotice();
   try {
@@ -61,7 +74,7 @@ async function runBusy(form, task) {
   } catch (error) {
     MM.notice(error.message, "error");
   } finally {
-    button.disabled = false;
+    MM.setBusy(button, false);
     form.removeAttribute("aria-busy");
   }
 }
@@ -96,7 +109,7 @@ async function handleCanvasBgSubmit(event) {
 
   await runBusy(canvasBgForm, async () => {
     sketchBg = await resolveColor(bgColor);
-    bgColorInput.value = sketchBg;
+    showColor(bgColorInput, sketchBg);
   });
 }
 
@@ -111,7 +124,7 @@ async function handleTextColorSubmit(event) {
   // Keep hold of the tile itself: the selection may change while the machine thinks.
   await runBusy(textColorForm, async () => {
     tile.c = await resolveColor(textColor);
-    if (wordTiles[activeTileIndex] === tile) textColorInput.value = tile.c;
+    if (wordTiles[activeTileIndex] === tile) showColor(textColorInput, tile.c);
   });
 }
 
@@ -125,50 +138,88 @@ async function handleTextBgSubmit(event) {
 
   await runBusy(textBgForm, async () => {
     tile.bg = await resolveColor(textBg);
-    if (wordTiles[activeTileIndex] === tile) textBgInput.value = tile.bg;
+    if (wordTiles[activeTileIndex] === tile) showColor(textBgInput, tile.bg);
   });
 }
 
-// Handle font size button clicks
-function handleFontSizeClick(e) {
-  if (!requireActiveTile()) return;
+// Handle size button clicks
+function handleSizeClick(event) {
+  const tile = requireActiveTile();
+  if (!tile) return;
 
-  // Remove selection from all buttons
-  fontSizeBtns.forEach((btn) => btn.classList.remove("selected"));
-
-  // Apply size and select button
-  const btn = e.target;
-  const sizeMap = {
-    XS: 8,
-    S: 12,
-    M: 16,
-    L: 20,
-    XL: 24,
-  };
-
-  const size = sizeMap[btn.textContent];
-  if (size) {
-    wordTiles[activeTileIndex].sz = size;
-    btn.classList.add("selected");
-  }
+  tile.sz = Number(event.currentTarget.dataset.size);
+  showChoice(sizeButtons, "size", tile.sz);
 }
 
-// Handle font toggle button click
-function handleFontToggle() {
-  if (!requireActiveTile()) return;
+// Handle font button clicks
+function handleFontClick(event) {
+  const tile = requireActiveTile();
+  if (!tile) return;
 
-  const currentTile = wordTiles[activeTileIndex];
+  tile.font = event.currentTarget.dataset.font;
+  showChoice(fontButtons, "font", tile.font);
+}
 
-  // Toggle between serif and sans-serif
-  if (currentTile.font === "serif") {
-    currentTile.font = "sans-serif";
-    fontToggle.textContent = "Sans-serif";
-    fontToggle.classList.remove("serif");
-  } else {
-    currentTile.font = "serif";
-    fontToggle.textContent = "Serif";
-    fontToggle.classList.add("serif");
+// Marks the button whose data attribute matches the value as pressed, and slides the
+// pill behind it (see .segmented in forms.css). A value of null leaves none pressed.
+function showChoice(buttons, attribute, value) {
+  const group = buttons[0].parentElement;
+  const index = buttons.findIndex(
+    (button) => String(button.dataset[attribute]) === String(value)
+  );
+
+  buttons.forEach((button, i) =>
+    button.setAttribute("aria-pressed", String(i === index))
+  );
+  group.style.setProperty("--count", buttons.length);
+
+  if (index >= 0) {
+    group.style.setProperty("--index", index);
+    // Reading a layout property makes the browser apply the new position now. Without
+    // it, the pill would start fading in while still sliding from its old place.
+    void group.offsetWidth;
   }
+  group.classList.toggle("segmented--empty", index < 0);
+}
+
+// Fills the dot inside a color field. No color leaves an empty ring.
+function showSwatch(input, color) {
+  const swatch = input.parentElement.querySelector(".controls__swatch");
+  swatch.style.backgroundColor = color || "";
+  // The picker under the dot opens on this color.
+  if (color) swatch.querySelector(".controls__picker").value = toPickerValue(color);
+}
+
+// A color picker only takes 6-digit hex codes, so #abc becomes #aabbcc.
+function toPickerValue(hex) {
+  if (!/^#[0-9a-f]{3}$/i.test(hex)) return hex;
+  return "#" + [...hex.slice(1)].map((digit) => digit + digit).join("");
+}
+
+// Makes the dot in a color field a color picker. `apply` is given the picked hex code
+// (and the selected word, if `needsTile`) and changes the poem.
+function setupPicker(selector, needsTile, apply) {
+  const textInput = document.querySelector(selector);
+  const picker = textInput.parentElement.querySelector(".controls__picker");
+
+  // With no word selected there is nothing to color: say so instead of opening it.
+  picker.addEventListener("click", (event) => {
+    if (needsTile && !requireActiveTile()) event.preventDefault();
+  });
+
+  // "input" fires as the color is dragged around, so the canvas follows along.
+  picker.addEventListener("input", () => {
+    const tile = wordTiles[activeTileIndex];
+    if (needsTile && !tile) return;
+    apply(picker.value, tile);
+    showColor(textInput, picker.value);
+  });
+}
+
+// Shows a color in a field: its hex code as text, and the dot.
+function showColor(input, color) {
+  input.value = color || "";
+  showSwatch(input, color);
 }
 
 // Validate hex color format
@@ -197,102 +248,119 @@ function appendWords(wordsArray) {
       wordsContainer.appendChild(wordElement);
     }
   });
+  updateCanvasHint();
 }
 
 // Create a word element
 function createWordElement(word) {
-  const wordElement = document.createElement("div");
+  const wordElement = document.createElement("button");
+  wordElement.type = "button";
   wordElement.classList.add("word");
+  wordElement.setAttribute("aria-pressed", "false");
   wordElement.textContent = word;
   wordElement.addEventListener("click", toggleWord);
   return wordElement;
 }
 
-// Toggle word selection and add/remove from canvas
-function toggleWord(e) {
-  const wordElement = e.target;
-  const targetHash = wordElement.dataset.hash;
-
-  if (wordElement.classList.contains("used")) {
-    // Remove from canvas
-    const index = wordTiles.findIndex((tile) => tile.hash === targetHash);
-    if (index !== -1) {
-      wordTiles.splice(index, 1);
-    }
-  } else {
-    // Add to canvas
-    const hash = Date.now().toString();
-    wordElement.dataset.hash = hash;
-
-    const newTile = {
-      hash: hash,
-      text: wordElement.textContent,
-      x: width / 2 - 50, // Center with slight offset
-      y: height / 2 - 10,
-      w: 0,
-      h: 0,
-      bg: "#000",
-      c: "#fff",
-      sz: 16,
-      font: "sans-serif", // Default font
-    };
-
-    wordTiles.push(newTile);
+// Puts a word on the canvas, or takes it off if it is already there.
+function toggleWord(event) {
+  const chip = event.currentTarget;
+  const tileOnCanvas = wordTiles.find((tile) => tile.chip === chip);
+  if (tileOnCanvas) {
+    removeTile(tileOnCanvas);
+    return;
   }
 
-  wordElement.classList.toggle("used");
+  const newTile = {
+    text: chip.textContent,
+    chip, // the word in the palette, so it can be switched off again
+    x: 0,
+    y: 0,
+    w: 0,
+    h: 0,
+    bg: "#000",
+    c: "#fff",
+    sz: 16,
+    font: "sans-serif", // Default font
+  };
+  placeTile(newTile);
+  wordTiles.push(newTile);
+  chip.setAttribute("aria-pressed", "true");
+
+  // Select it, so its color, size and font can be changed straight away.
+  activeTileIndex = wordTiles.length - 1;
+  isDragging = false;
+  updateEditor(newTile);
+  updateCanvasHint();
+}
+
+// Takes a word off the canvas and puts its chip back to normal.
+function removeTile(tile) {
+  const index = wordTiles.indexOf(tile);
+  if (index === -1) return;
+
+  wordTiles.splice(index, 1);
+  tile.chip.setAttribute("aria-pressed", "false");
+
+  // Keep the selection on the same tile, or drop it if that tile was removed.
+  if (index === activeTileIndex) {
+    activeTileIndex = null;
+    clearEditor();
+  } else if (activeTileIndex !== null && index < activeTileIndex) {
+    activeTileIndex--;
+  }
+  updateCanvasHint();
+}
+
+function handleRemoveClick() {
+  const tile = requireActiveTile();
+  if (tile) removeTile(tile);
+}
+
+// Delete or Backspace takes the selected word off the canvas, unless you are typing in
+// a field or a dialog is open.
+function handleKeydown(event) {
+  if (event.key !== "Delete" && event.key !== "Backspace") return;
+  if (event.target.closest?.("input, textarea, select")) return;
+  if (document.querySelector("dialog[open]")) return;
+
+  const tile = wordTiles[activeTileIndex];
+  if (!tile) return;
+  event.preventDefault(); // Backspace can also mean "go back" in some browsers
+  removeTile(tile);
+}
+
+// Tells an empty canvas what to do next. Hidden once a word is on it.
+function updateCanvasHint() {
+  const hasWords = document.querySelector(".word") !== null;
+  canvasHint.textContent = hasWords
+    ? "Pick a word to place it here."
+    : "Generate some words to begin.";
+  canvasHint.hidden = wordTiles.length > 0;
 }
 
 // Update editor interface with selected tile properties
 function updateEditor(tile) {
-  const textColorInput = document.querySelector("#text-fg");
-  const textBgInput = document.querySelector("#text-bg");
-
-  // Update color inputs
-  textColorInput.value = tile.c;
-  textBgInput.value = tile.bg;
-
-  // Update font size selection
-  fontSizeBtns.forEach((btn) => btn.classList.remove("selected"));
-
-  const sizeButtonMap = {
-    8: 0, // XS
-    12: 1, // S
-    16: 2, // M
-    20: 3, // L
-    24: 4, // XL
-  };
-
-  const buttonIndex = sizeButtonMap[tile.sz] || 2; // Default to M
-  fontSizeBtns[buttonIndex].classList.add("selected");
-
-  // Update font toggle
-  if (tile.font === "serif") {
-    fontToggle.textContent = "Serif";
-    fontToggle.classList.add("serif");
-  } else {
-    fontToggle.textContent = "Sans-serif";
-    fontToggle.classList.remove("serif");
-  }
+  showColor(document.querySelector("#text-fg"), tile.c);
+  showColor(document.querySelector("#text-bg"), tile.bg);
+  showChoice(sizeButtons, "size", tile.sz);
+  showChoice(fontButtons, "font", tile.font);
+  editor.classList.remove("editor--idle");
 }
 
 // Clear editor selection
 function clearEditor() {
-  document.querySelector("#text-fg").value = "";
-  document.querySelector("#text-bg").value = "";
-  fontSizeBtns.forEach((btn) => btn.classList.remove("selected"));
-  fontToggle.textContent = "Sans-serif";
-  fontToggle.classList.remove("serif");
+  showColor(document.querySelector("#text-fg"), null);
+  showColor(document.querySelector("#text-bg"), null);
+  showChoice(sizeButtons, "size", null);
+  showChoice(fontButtons, "font", null);
+  editor.classList.add("editor--idle");
 }
 
 // Download canvas as image
 function downloadImage() {
-  // Clear selection before download
-  activeTileIndex = null;
-  clearEditor();
-  // Redraw first, so the selection outline isn't saved into the image.
-  redraw();
-
+  // Without the selection outline, which would be saved into the image.
+  canvasWithoutSelection();
   saveCanvas(`mm_visual-poetry_${MM.timestamp()}`, "png");
 }
 
@@ -303,12 +371,8 @@ const MAX_SEND_BYTES = 5 * 1024 * 1024;
 
 // The canvas as a PNG data URL, scaled down to fit the size limits.
 function canvasForSending() {
-  // Redraw first, so the selection outline isn't included.
-  activeTileIndex = null;
-  clearEditor();
-  redraw();
-
-  const source = document.querySelector(".preview canvas");
+  // Without the selection outline.
+  const source = canvasWithoutSelection();
   let scale = Math.min(1, MAX_SEND_SIDE / Math.max(source.width, source.height));
 
   for (let attempt = 0; attempt < 4; attempt++) {
@@ -328,7 +392,7 @@ function canvasForSending() {
 // Sends the canvas to the host's gallery, captioned with your name and pronouns
 // (the server adds those from your join details).
 async function sendToScreen() {
-  sendButton.disabled = true;
+  MM.setBusy(sendButton, true);
   MM.clearNotice();
   try {
     const image = canvasForSending();
@@ -345,7 +409,7 @@ async function sendToScreen() {
   } catch (error) {
     MM.notice(error.message, "error");
   } finally {
-    sendButton.disabled = false;
+    MM.setBusy(sendButton, false);
   }
 }
 

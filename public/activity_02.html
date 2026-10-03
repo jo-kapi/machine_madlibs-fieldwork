@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/layout.css" />
     <link rel="stylesheet" href="css/buttons.css" />
+    <link rel="stylesheet" href="css/forms.css" />
     <link rel="stylesheet" href="css/dialogs.css" />
     <link rel="stylesheet" href="css/peek.css" />
     <link rel="stylesheet" href="css/activity-02.css" />
@@ -50,69 +51,141 @@
       </div>
     </div>
 
-    <p class="notice" role="status" hidden></p>
-
     <main>
       <section class="activity-02">
-        <div class="preview"></div>
+        <div class="preview">
+          <p class="preview__hint">Generate some words to begin.</p>
+          <p class="notice notice--toast" role="status" hidden></p>
+        </div>
         <div class="controls">
-          <div class="word-palette">
-            <h3>Word Palette + Editor</h3>
-            <form id="form-keywords">
+          <section class="controls__section controls__section--words">
+            <h2 class="label">Words</h2>
+            <form id="form-keywords" class="controls__row">
               <input
                 type="text"
                 name="keyword"
                 id="input-keyword"
+                class="input"
                 maxlength="100"
-                placeholder="Leave blank for filler"
+                placeholder="A theme, or blank for filler"
+                aria-label="Theme"
               />
-              <button type="submit">Generate Words</button>
+              <button type="submit" class="btn btn--large">Generate</button>
             </form>
             <div class="words"></div>
-          </div>
-          <div class="editor">
-            <form id="form-canvas-bg">
-              <img src="images/icon_bg.svg" alt="" />
-              <input
-                type="text"
-                name="canvas-bg"
-                id="canvas-bg"
-                maxlength="100"
-                placeholder="Canvas background"
-              />
-              <button type="submit">Apply</button>
+          </section>
+
+          <section class="controls__section">
+            <h2 class="label">Canvas</h2>
+            <form id="form-canvas-bg" class="controls__row controls__row--color">
+              <img src="images/icon_bg.svg" alt="" class="controls__icon" />
+              <div class="controls__field">
+                <input
+                  type="text"
+                  name="canvas-bg"
+                  id="canvas-bg"
+                  class="input"
+                  maxlength="100"
+                  placeholder="Background color"
+                  aria-label="Canvas background color"
+                />
+                <label class="controls__swatch">
+                  <input
+                    type="color"
+                    class="controls__picker"
+                    value="#e6e6e6"
+                    aria-label="Pick the canvas background color"
+                  />
+                </label>
+              </div>
+              <button type="submit" class="btn btn--large">Apply</button>
             </form>
-            <form id="form-text-fg">
-              <img src="images/icon_text.svg" alt="" />
-              <input
-                type="text"
-                name="text-fg"
-                id="text-fg"
-                maxlength="100"
-                placeholder="Text color"
-              />
-              <button type="submit">Apply</button>
-            </form>
-            <form id="form-text-bg">
-              <img src="images/icon_tile.svg" alt="" />
-              <input
-                type="text"
-                name="text-bg"
-                id="text-bg"
-                maxlength="100"
-                placeholder="Tile background"
-              />
-              <button type="submit">Apply</button>
-            </form>
-            <div class="font-sizes">
-              <div class="size">XS</div>
-              <div class="size">S</div>
-              <div class="size">M</div>
-              <div class="size">L</div>
-              <div class="size">XL</div>
+          </section>
+
+          <section class="controls__section editor editor--idle">
+            <div class="controls__heading">
+              <h2 class="label">Selected word</h2>
+              <button type="button" class="btn btn--small editor__remove">Remove</button>
             </div>
-            <div class="font-toggle">Sans-serif</div>
-          </div>
+            <form id="form-text-fg" class="controls__row controls__row--color">
+              <img src="images/icon_text.svg" alt="" class="controls__icon" />
+              <div class="controls__field">
+                <input
+                  type="text"
+                  name="text-fg"
+                  id="text-fg"
+                  class="input"
+                  maxlength="100"
+                  placeholder="Text color"
+                  aria-label="Text color"
+                />
+                <label class="controls__swatch">
+                  <input
+                    type="color"
+                    class="controls__picker"
+                    value="#000000"
+                    aria-label="Pick the text color"
+                  />
+                </label>
+              </div>
+              <button type="submit" class="btn btn--large">Apply</button>
+            </form>
+            <form id="form-text-bg" class="controls__row controls__row--color">
+              <img src="images/icon_tile.svg" alt="" class="controls__icon" />
+              <div class="controls__field">
+                <input
+                  type="text"
+                  name="text-bg"
+                  id="text-bg"
+                  class="input"
+                  maxlength="100"
+                  placeholder="Tile color"
+                  aria-label="Tile color"
+                />
+                <label class="controls__swatch">
+                  <input
+                    type="color"
+                    class="controls__picker"
+                    value="#000000"
+                    aria-label="Pick the tile color"
+                  />
+                </label>
+              </div>
+              <button type="submit" class="btn btn--large">Apply</button>
+            </form>
+            <div
+              class="segmented segmented--empty editor__sizes"
+              role="group"
+              aria-label="Size"
+            >
+              <button type="button" class="segmented__option" data-size="8">XS</button>
+              <button type="button" class="segmented__option" data-size="12">S</button>
+              <button type="button" class="segmented__option" data-size="16">M</button>
+              <button type="button" class="segmented__option" data-size="20">L</button>
+              <button type="button" class="segmented__option" data-size="24">XL</button>
+              <button type="button" class="segmented__option" data-size="32">XXL</button>
+            </div>
+            <div
+              class="segmented segmented--empty editor__fonts"
+              role="group"
+              aria-label="Font"
+            >
+              <button
+                type="button"
+                class="segmented__option segmented__option--sans"
+                data-font="sans-serif"
+              >
+                Sans-serif
+              </button>
+              <button
+                type="button"
+                class="segmented__option segmented__option--serif"
+                data-font="serif"
+              >
+                Serif
+              </button>
+            </div>
+          </section>
         </div>
       </section>
     </main>

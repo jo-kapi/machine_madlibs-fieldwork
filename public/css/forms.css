@@ -1,7 +1,26 @@
 /* FORM FIELDS
-   .input is the pill-shaped text field used for the main thing you type on a page. */
+   .input is the pill-shaped text field used for the main thing you type on a page.
+   .label is the small uppercase heading above a group of controls.
+   .segmented is a row of buttons where one is selected at a time. */
+.label {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  /* A quieter aside in the same line, such as "(optional)". */
+  & small {
+    font-size: inherit;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+}
+
 .input {
-  min-height: 3rem;
+  min-height: var(--control-height-large);
   padding-inline: var(--space-md);
   border: solid thin var(--color-border-strong);
   border-radius: var(--radius-pill);
@@ -25,5 +44,71 @@
 
   &:disabled {
     cursor: not-allowed;
+  }
+}
+
+/* One pill holding the choices, with a second pill that slides to the chosen one. The
+   script sets aria-pressed="true" on the chosen option, tells the sliding pill where
+   to go with --index (which option) and --count (how many), and adds
+   .segmented--empty while nothing is chosen. */
+.segmented {
+  position: relative;
+  display: flex;
+  gap: var(--space-xs);
+  padding: 2px;
+  border: solid thin var(--color-border-strong);
+  border-radius: var(--radius-pill);
+
+  /* The sliding pill: the width of one option, moved along by whole options. */
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block: 2px;
+    left: 2px;
+    box-sizing: border-box;
+    width: calc((100% - 4px - (var(--count, 1) - 1) * var(--space-xs)) / var(--count, 1));
+    border: solid thin var(--color-accent);
+    border-radius: var(--radius-pill);
+    background: var(--color-accent-soft);
+    translate: calc(var(--index, 0) * (100% + var(--space-xs)));
+    transition:
+      translate var(--transition) var(--ease-out),
+      opacity var(--transition);
+  }
+
+  /* With nothing chosen it fades out where it is. It has no slide in this state, so it
+     can be moved while hidden and then fade in already in place. */
+  &.segmented--empty::before {
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+
+  /* People who prefer less motion get the fade, not the slide. */
+  @media (prefers-reduced-motion: reduce) {
+    &::before {
+      transition: opacity var(--transition);
+    }
+  }
+}
+
+.segmented__option {
+  position: relative; /* above the sliding pill */
+  flex: 1;
+  min-height: calc(var(--control-height) - 6px);
+  padding-inline: var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--text-md);
+  cursor: pointer;
+  transition: all var(--transition);
+
+  &:hover:not([aria-pressed="true"]) {
+    background: var(--color-surface-hover);
+  }
+
+  &[aria-pressed="true"] {
+    font-weight: 500;
   }
 }

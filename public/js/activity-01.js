@@ -229,10 +229,8 @@ function cardNote(turn) {
 
 // The machine's turn while it is still writing: three dots that bounce (see the CSS).
 function thinkingElement() {
-  const dots = MM.el("span", "story__dots");
-  dots.setAttribute("role", "img");
-  dots.setAttribute("aria-label", "AI is thinking");
-  for (let i = 0; i < 3; i++) dots.append(MM.el("span", "story__dot"));
+  const dots = MM.dots("AI is thinking");
+  dots.classList.add("story__dots");
 
   const paragraph = MM.el("p", "story__turn story__turn--ai");
   paragraph.append(MM.el("span", "story__speaker", "AI"), dots);
