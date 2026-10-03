@@ -1,23 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Machine Madlibs – SOAI '25' | Activity 02 – Visual Poetry</title>
+    <title>Machine Madlibs – field:work | Activity 02 – Visual Poetry</title>
     <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/layout.css" />
     <link rel="stylesheet" href="css/activity-02.css" />
   </head>
-  <body>
-    <header>
-      <h1>Machine Madlibs</h1>
-      <nav>
+  <body class="page--fit-wide">
+    <header class="site-header">
+      <h1>Machine Madlibs <span class="site-header__event">field:work</span></h1>
+      <nav class="site-nav">
         <a href="activity_01.html">Activity 01</a>
         <a href="activity_02.html" class="active">Activity 02</a>
+        <a href="activity_03.html">Activity 03</a>
       </nav>
-      <button class="save-btn">↓ Download Image</button>
+      <div class="site-header__actions">
+        <button class="save-btn">↓ Download Image</button>
+        <button class="send-btn">Send to screen</button>
+      </div>
     </header>
+
+    <div class="info">
+      <details class="info__panel" data-remember="activity-02" open>
+        <summary>How this works</summary>
+        <div class="info__body">
+          <ol>
+            <li>
+              Type a theme and press Generate Words. Leave it blank for filler words like
+              "the" and "of".
+            </li>
+            <li>Click a word to put it on the canvas. Click it again to take it off.</li>
+            <li>Drag words around. Select one on the canvas to restyle it.</li>
+            <li>
+              Colours can be hex codes (#ff3b5b) or a description ("burnt orange"). The
+              machine turns descriptions into colours.
+            </li>
+            <li>Download your image when you're done.</li>
+          </ol>
+        </div>
+      </details>
+      <details class="info__panel" data-peek="poet">
+        <summary>Peek at the system prompt: words</summary>
+        <div class="info__body"></div>
+      </details>
+      <details class="info__panel" data-peek="color">
+        <summary>Peek at the system prompt: colours</summary>
+        <div class="info__body"></div>
+      </details>
+    </div>
+
+    <p class="notice" role="status" hidden></p>
+
     <main>
       <section class="activity-02">
         <div class="preview"></div>
@@ -29,6 +65,7 @@
                 type="text"
                 name="keyword"
                 id="input-keyword"
+                maxlength="100"
                 placeholder="Leave blank for filler"
               />
               <button type="submit">Generate Words</button>
@@ -37,26 +74,34 @@
           </div>
           <div class="editor">
             <form id="form-canvas-bg">
-              <img src="images/icon_bg.svg" />
+              <img src="images/icon_bg.svg" alt="" />
               <input
                 type="text"
                 name="canvas-bg"
                 id="canvas-bg"
+                maxlength="100"
                 placeholder="Canvas background"
               />
               <button type="submit">Apply</button>
             </form>
             <form id="form-text-fg">
-              <img src="images/icon_text.svg" />
-              <input type="text" name="text-fg" id="text-fg" placeholder="Text color" />
+              <img src="images/icon_text.svg" alt="" />
+              <input
+                type="text"
+                name="text-fg"
+                id="text-fg"
+                maxlength="100"
+                placeholder="Text color"
+              />
               <button type="submit">Apply</button>
             </form>
             <form id="form-text-bg">
-              <img src="images/icon_tile.svg" />
+              <img src="images/icon_tile.svg" alt="" />
               <input
                 type="text"
                 name="text-bg"
                 id="text-bg"
+                maxlength="100"
                 placeholder="Tile background"
               />
               <button type="submit">Apply</button>
@@ -73,8 +118,9 @@
         </div>
       </section>
     </main>
+
     <script src="js/p5.min.js"></script>
-    <script src="js/config.js"></script>
+    <script src="js/common.js"></script>
     <script src="js/activity-02.js"></script>
     <script src="js/sketch.js"></script>
   </body>

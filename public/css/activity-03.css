@@ -1,0 +1,264 @@
+/* TEMP CHECK: PLAYER PAGE
+   A single centred column. It has no fixed widths, so it fits whatever device
+   is used. */
+
+.temp {
+  align-items: center;
+}
+
+.temp__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+
+  width: 100%;
+  max-width: 36rem;
+}
+
+.temp__status {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+
+.temp__stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+
+  & p,
+  & h2 {
+    margin: 0;
+  }
+}
+
+.temp__title {
+  font-size: 1.75rem;
+}
+
+.temp__text {
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.temp__muted {
+  color: var(--color-text-muted);
+}
+
+.temp__link {
+  color: var(--color-accent);
+  font-size: 1.1rem;
+}
+
+/* Ellipsis that pulses while the machine works. */
+.thinking {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* MODE AND STEM */
+.mode {
+  align-self: flex-start;
+  padding: 0.25em 0.75em;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-weight: 500;
+
+  &.mode--match {
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  &.mode--beat {
+    background: var(--color-invert-bg);
+    color: var(--color-invert-text);
+  }
+}
+
+.stem {
+  font-size: 1.75rem;
+  line-height: 1.4;
+}
+
+.stem__blank {
+  display: inline-block;
+  min-width: 4ch;
+  border-bottom: 3px solid var(--color-text);
+}
+
+/* TEMPERATURE GAUGE */
+.gauge__label {
+  font-family: var(--font-mono);
+}
+
+/* A cold-to-hot track with a marker at the current temperature. */
+.gauge__track {
+  position: relative;
+  height: 0.75rem;
+  margin-block: 0.6rem 0.25rem;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+    90deg,
+    var(--color-cold),
+    var(--color-surface-hover),
+    var(--color-hot)
+  );
+}
+
+.gauge__marker {
+  position: absolute;
+  top: -0.3rem;
+  width: 0.4rem;
+  height: 1.35rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-text);
+  transform: translateX(-50%);
+  transition: left var(--transition);
+}
+
+/* COUNTDOWN AND ANSWER */
+.countdown {
+  font-family: var(--font-mono);
+  font-size: 3rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.countdown__track {
+  height: 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-hover);
+  overflow: hidden;
+}
+
+.countdown__bar {
+  height: 100%;
+  background: var(--color-invert-bg);
+}
+
+.answer {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.answer__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.9rem;
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  font-size: 1.5rem;
+}
+
+.answer__button {
+  padding: 0 1.25rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-invert-bg);
+  color: var(--color-invert-text);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* HOT AND COLD (finale) */
+.vote {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.vote__button {
+  padding: 1.25rem;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--color-invert-text);
+  font-size: 1.25rem;
+  cursor: pointer;
+
+  &.vote__button--hot {
+    background: var(--color-hot);
+  }
+
+  &.vote__button--cold {
+    background: var(--color-cold);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.pips {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.pips__pip {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--color-surface-hover);
+
+  &.pips__pip--on {
+    background: var(--color-text);
+  }
+
+  &.pips__pip--on.pips__pip--hot {
+    background: var(--color-hot);
+  }
+
+  &.pips__pip--on.pips__pip--cold {
+    background: var(--color-cold);
+  }
+}
+
+/* RESULTS */
+.points {
+  font-family: var(--font-mono);
+  font-size: 3.5rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.board__row {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  gap: var(--space-sm);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  font-size: 1.1rem;
+
+  &.board__row--you {
+    background: var(--color-accent-soft);
+    outline: 2px solid var(--color-accent-border);
+  }
+}
+
+.board__rank {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+
+.board__total {
+  font-family: var(--font-mono);
+  font-weight: 500;
+}

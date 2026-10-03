@@ -134,3 +134,42 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Maintainer's personal notes and AI-assistant tooling.
+# AGENTS.md is the shared, committed version of this guidance.
+HANDOFF.md
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+.cursor/
+.cursorrules
+.windsurf/
+.aider*
+.codex/
+.gemini/
+GEMINI.md
+
+# Maintainer's model taste test: personal testing, not part of the workshop kit
+scripts/bakeoff.mjs
+scripts/out/
+
+# Scratch space
+scratch/
+tmp/
+
+# Maintainer's local tests (run with: node --test "test/*.test.js")
+test/
+
+# Editor and IDE folders
+.nova/
+.vscode/
+.idea/
+.fleet/
+.zed/
+.vs/
+.history/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~

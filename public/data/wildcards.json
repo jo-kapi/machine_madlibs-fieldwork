@@ -1,0 +1,38 @@
+[
+  {
+    "id": "twist",
+    "title": "Plot twist",
+    "human": "Make something unexpected happen.",
+    "ai": "Make something unexpected happen."
+  },
+  {
+    "id": "senses",
+    "title": "Sensory detail",
+    "human": "Include a smell or a sound.",
+    "ai": "Describe something the character smells or hears."
+  },
+  {
+    "id": "newcomer",
+    "title": "New arrival",
+    "human": "Bring a new character into the story.",
+    "ai": "Introduce a new character."
+  },
+  {
+    "id": "weather",
+    "title": "Change the weather",
+    "human": "Let the weather change, suddenly.",
+    "ai": "Make the weather change suddenly."
+  },
+  {
+    "id": "secret",
+    "title": "A secret",
+    "human": "Reveal something a character has been hiding.",
+    "ai": "Reveal something a character has been hiding."
+  },
+  {
+    "id": "tiny",
+    "title": "Zoom in",
+    "human": "Describe one very small detail.",
+    "ai": "Describe one very small, specific detail."
+  }
+]

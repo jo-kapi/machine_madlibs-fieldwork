@@ -1,0 +1,72 @@
+/* DESIGN TOKENS
+   Every colour, font and size used by the app comes from this file,
+   so re-theming means editing the values below and nothing else. */
+
+/* BRAND FONTS
+   ABC Areal and ABC Areal Mono, the field:work typefaces (files in fonts/). Both
+   are variable: weight 400 to 700, slant, and a "DRKM" axis tuned for light text on
+   dark backgrounds. If a file fails to load, the fallbacks in --font-ui and
+   --font-mono are used. */
+@font-face {
+  font-family: "ABC Areal";
+  src: url("fonts/ABCArealVariable.ttf") format("truetype");
+  font-weight: 400 700;
+  font-style: oblique -12deg 0deg;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "ABC Areal Mono";
+  src: url("fonts/ABCArealMonoVariable.ttf") format("truetype");
+  font-weight: 400 700;
+  font-style: oblique -12deg 0deg;
+  font-display: swap;
+}
+
+:root {
+  /* Colour */
+  --color-bg: #fff;
+  --color-surface: rgb(245, 245, 245);
+  --color-surface-hover: rgb(230, 230, 230);
+  --color-text: #000;
+  --color-text-soft: #333;
+  --color-text-muted: grey;
+  --color-border: lightgray;
+  --color-border-strong: grey;
+  --color-accent: rgb(0, 120, 120);
+  --color-accent-soft: lightcyan;
+  --color-accent-border: darkcyan;
+  --color-invert-bg: #000;
+  --color-invert-text: #fff;
+  --color-selection: #ff3b5b; /* outline of the selected tile on the canvas */
+  --color-hot: #e8452c; /* Temp Check: high temperature */
+  --color-cold: #2f6fdd; /* Temp Check: low temperature */
+  --color-error: #b3261e;
+  --color-error-soft: #fdecea;
+
+  /* Host screen (projector): high contrast on dark */
+  --color-host-bg: #0d0d0f;
+  --color-host-surface: #1c1c21;
+  --color-host-text: #fff;
+  --color-host-muted: #9a9aa2;
+  --color-host-accent: #7ee0d0;
+  --color-good: #48d17a;
+  --color-warn: #f2b134;
+
+  /* Type */
+  --font-ui:
+    "ABC Areal", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "ABC Areal Mono", ui-monospace, monospace;
+  --font-serif: Georgia, serif;
+  --font-size-base: 14px;
+
+  /* Shape and spacing */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-pill: 5rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --transition: 250ms;
+}

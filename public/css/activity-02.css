@@ -3,61 +3,71 @@
 .activity-02 {
   display: grid;
   grid-template-columns: 2.5fr 1.15fr;
+  grid-template-rows: minmax(0, 1fr);
   gap: 2rem;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  height: 100%;
 }
 
 .preview {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 0;
   width: 100%;
 
   & canvas {
-    border-radius: 0.5rem;
-    border: thin solid lightgray;
+    border-radius: var(--radius-md);
+    border: thin solid var(--color-border);
+    /* Touch drags move tiles instead of scrolling the page. */
+    touch-action: none;
   }
 }
 
 .controls {
   display: grid;
   grid-template-rows: 2fr 1fr;
-  gap: 1.5rem;
+  gap: var(--space-lg);
+  min-height: 0;
   width: 100%;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  background: rgb(245, 245, 245);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
 
   & input {
     width: 100%;
     height: fit-content;
     padding: 0.75rem;
     margin-bottom: 0.5rem;
-    border: 1px solid rgb(220, 220, 220);
-    border-radius: 0.25rem;
+    border: 1px solid var(--color-surface-hover);
+    border-radius: var(--radius-sm);
     font-size: 14px;
     transition: border-color 0.2s;
 
     &:focus {
-      border-color: grey;
-      outline: none;
+      border-color: var(--color-border-strong);
     }
   }
 
   & button {
     width: 100%;
     padding: 0.75rem;
-    background: black;
-    color: white;
+    background: var(--color-invert-bg);
+    color: var(--color-invert-text);
     border: none;
-    border-radius: 0.25rem;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.2s;
 
-    &:hover {
-      background: grey;
+    &:hover:not(:disabled) {
+      background: var(--color-text-muted);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: wait;
     }
   }
 }
@@ -65,13 +75,14 @@
 .word-palette {
   display: flex;
   flex-direction: column;
+  min-height: 0;
   height: 100%;
 
   & h3 {
     margin-top: 0;
     margin-bottom: 1rem;
     font-size: 1.25rem;
-    color: #333;
+    color: var(--color-text-soft);
     flex-shrink: 0;
   }
 
@@ -103,9 +114,9 @@
   min-height: 0;
   padding: 0.5rem;
   overflow-y: auto;
-  background: white;
-  border-radius: 0.25rem;
-  border: 1px solid #ddd;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
 }
 
 .word {
@@ -114,21 +125,21 @@
   justify-content: center;
   min-height: 2rem;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #333;
+  border: 1px solid var(--color-text-soft);
   background: transparent;
-  border-radius: 0.25rem;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s;
 
   &:hover {
-    background: #f8f8f8;
+    background: var(--color-surface);
     transform: translateY(-1px);
   }
 
   &.used {
     opacity: 0.3;
-    background: #eee;
+    background: var(--color-surface-hover);
     cursor: not-allowed;
   }
 }
@@ -176,9 +187,9 @@
     flex: 1;
     min-height: 2.5rem;
     padding: 0.5rem;
-    border: 1px solid grey;
-    background: white;
-    border-radius: 0.25rem;
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-bg);
+    border-radius: var(--radius-sm);
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
@@ -186,13 +197,13 @@
   }
 
   & .size:hover {
-    background: black;
-    color: white;
+    background: var(--color-invert-bg);
+    color: var(--color-invert-text);
   }
 
   & .size.selected {
-    background: #333;
-    color: white;
+    background: var(--color-text-soft);
+    color: var(--color-invert-text);
   }
 }
 
@@ -203,9 +214,9 @@
   width: 100%;
   min-height: 2.5rem;
   padding: 0.5rem;
-  border: 1px solid grey;
-  background: white;
-  border-radius: 0.25rem;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -213,26 +224,36 @@
   margin-top: 0.5rem;
 
   &:hover {
-    background: black;
-    color: white;
+    background: var(--color-invert-bg);
+    color: var(--color-invert-text);
   }
 
   &.serif {
-    background: #333;
-    color: white;
-    font-family: Georgia, serif;
+    background: var(--color-text-soft);
+    color: var(--color-invert-text);
+    font-family: var(--font-serif);
   }
 }
 
-/* Responsive adjustments */
+/* Narrower screens (tablets held upright): canvas above the controls,
+   and the page scrolls. */
 @media (max-width: 1024px) {
   .activity-02 {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: auto auto;
   }
+
+  .preview {
+    aspect-ratio: 1;
+    /* Never taller than the screen, so the whole canvas can be seen at once. */
+    width: min(100%, 80dvh);
+    margin-inline: auto;
+  }
+
   .controls {
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: auto auto;
   }
+
   .words {
     min-height: 15vh;
   }

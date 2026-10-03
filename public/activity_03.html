@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Machine Madlibs – field:work | Activity 03 – Temp Check</title>
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/activity-03.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>Machine Madlibs <span class="site-header__event">field:work</span></h1>
+      <nav class="site-nav">
+        <a href="activity_01.html">Activity 01</a>
+        <a href="activity_02.html">Activity 02</a>
+        <a href="activity_03.html" class="active">Activity 03</a>
+      </nav>
+    </header>
+
+    <div class="info">
+      <details class="info__panel" data-remember="temp" open>
+        <summary>How this works</summary>
+        <div class="info__body">
+          <ol>
+            <li>The host shows a sentence with a blank, here and on the big screen.</li>
+            <li>
+              When the timer starts, type one word to fill the blank. You have 10 seconds.
+            </li>
+            <li>Meanwhile the machine fills the same blank 20 times.</li>
+            <li>
+              Be the machine: score by how often the machine picks your word. Beat the
+              machine: score 100 for a word that neither the machine nor anyone else said.
+            </li>
+            <li>
+              Temperature controls how adventurous the machine is. Watch what happens as
+              it rises.
+            </li>
+          </ol>
+        </div>
+      </details>
+      <details class="info__panel" data-peek="temp">
+        <summary>Peek at the system prompt</summary>
+        <div class="info__body"></div>
+      </details>
+    </div>
+
+    <p class="notice" role="status" hidden></p>
+
+    <main class="temp">
+      <section class="temp__panel" aria-live="polite">
+        <p class="temp__status"></p>
+        <div class="temp__stage"></div>
+      </section>
+    </main>
+
+    <script src="js/common.js"></script>
+    <script src="js/activity-03.js"></script>
+  </body>
+</html>

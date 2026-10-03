@@ -1,232 +1,251 @@
-// DOM Elements
-let textDisplay, form, input, button, saveButton;
-const MAX_WORDS = 200;
+// Micro-fiction: you and the machine take turns writing a story, one sentence each.
+// The story ends at this many words. This is the one place the limit is set.
+const MAX_WORDS = 350;
 
-// Initialize the app
+// DOM elements
+const storyElement = document.querySelector(".story");
+const scroller = document.querySelector(".text-display");
+const form = document.querySelector(".prompt");
+const input = form.querySelector("input");
+const sendButton = form.querySelector(".prompt__send");
+const cardButton = form.querySelector(".prompt__card");
+const cardElement = document.querySelector(".wildcard");
+const countElement = document.querySelector(".word-count");
+const saveButton = document.querySelector(".save-btn");
+
+// State
+const story = []; // turns so far: { role: "ai" | "human", text, card? }
+let isBusy = false; // waiting for the machine
+let failure = null; // the last failed request, shown with a retry button
+let drawnCard = null; // drawn, but not yet used in a sentence
+let turnCard = null; // the card that applies to the machine's current turn
+let allCards = [];
+let deck = []; // cards not yet drawn in this round
+
 function init() {
-  textDisplay = document.querySelector(".text-display p");
-  form = document.querySelector(".prompt");
-  input = document.querySelector(".prompt input");
-  button = document.querySelector(".prompt button");
-  saveButton = document.querySelector(".save-btn");
+  // Show the limit wherever the page mentions it.
+  for (const place of document.querySelectorAll("[data-max-words]")) {
+    place.textContent = MAX_WORDS;
+  }
 
-  // Initialize with a starting sentence
-  getSentence();
-  // Handle form submission
+  // First-time visitors are sent to the join page.
+  if (!MM.requireIdentity()) return;
+  MM.initInfoPanels();
+
   form.addEventListener("submit", handleSubmit);
-  // Handle download button
+  cardButton.addEventListener("click", drawCard);
+  cardElement
+    .querySelector(".wildcard__dismiss")
+    .addEventListener("click", () => setDrawnCard(null));
   saveButton.addEventListener("click", downloadText);
-  // Check word count on initialization
-  checkWordCount();
-}
 
-// Handle form submission
-function handleSubmit(e) {
-  e.preventDefault();
-  const userInput = input.value.trim();
-
-  if (userInput) {
-    // Add user input to display
-    appendToDisplay(`<strong>You:</strong> ${userInput}`);
-    // Get AI response
-    getSentence(userInput);
-    // Clear input
-    input.value = "";
-  }
-}
-
-// Make request from Ollama
-function getSentence(userInput) {
-  const model = "mm_writer";
-  const url = API;
-
-  let prompt;
-
-  if (!userInput) {
-    prompt = "mm_writer_start";
+  restoreStory();
+  // Start a new story, or finish the machine's turn if the page was reloaded
+  // while it was still writing.
+  if (story.length === 0 || story.at(-1).role === "human") {
+    requestAiTurn();
   } else {
-    // Get the full story context and add the new user input
-    const currentStory = htmlContentToStory(textDisplay.innerHTML);
-    prompt = currentStory ? `${currentStory} ${userInput}` : userInput;
-  }
-
-  const request = {
-    model: model,
-    prompt: prompt,
-    stream: false,
-    options: {
-      temperature: 0.7,
-      max_tokens: 150,
-    },
-  };
-
-  // Show loading state
-  if (userInput) {
-    appendToDisplay(`<em>AI is thinking...</em>`);
-  }
-
-  // Generate the next sentence
-  fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(request),
-  })
-    .then(handleResponse)
-    .then(handleData)
-    .catch(handleError);
-}
-
-// Handle fetch response
-function handleResponse(response) {
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return response.json();
-}
-
-// Handle successful data response
-function handleData(data) {
-  console.log("AI Response:", data.response);
-  // Remove loading message if it exists
-  removeLastMessage();
-  // Add AI response to display
-  appendToDisplay(`<strong>AI:</strong> ${data.response}`);
-  // Check word count and disable form if necessary
-  checkWordCount();
-}
-
-// Check word count and disable form if over 200 words
-function checkWordCount() {
-  const currentStory = htmlContentToStory(textDisplay.innerHTML);
-  const wordCount = currentStory.split(/\s+/).filter((word) => word.length > 0).length;
-
-  console.log(`Current word count: ${wordCount}`);
-
-  if (wordCount >= MAX_WORDS) {
-    // Disable the form
-    input.disabled = true;
-    button.disabled = true;
-    input.placeholder = "Maximum word count reached";
-    // Add visual styling for disabled state
-    form.style.opacity = "0.5";
-    form.style.pointerEvents = "none";
-  } else {
-    // Re-enable the form if under 200 words
-    input.disabled = false;
-    button.disabled = false;
-    input.placeholder = "";
-    // Remove disabled styling
-    form.style.opacity = "1";
-    form.style.pointerEvents = "auto";
+    render();
   }
 }
 
-// Handle errors
-function handleError(error) {
-  console.error("Error:", error);
-  // Remove loading message if it exists
-  removeLastMessage();
-  // Show error message
-  appendToDisplay(`<em style="color: red;">Error: ${error.message}</em>`);
-}
+// ---------- the story ----------
 
-// Helper function to append text to display
-function appendToDisplay(text) {
-  const currentContent = textDisplay.innerHTML;
-  const separator = currentContent ? "<br><br>" : "";
-  textDisplay.innerHTML = currentContent + separator + text;
-  // Scroll to bottom
-  const textDisplayContainer = document.querySelector(".text-display");
-  textDisplayContainer.scrollTop = textDisplayContainer.scrollHeight;
-}
+// The story survives a page reload, but only in this browser tab.
+const STORAGE_KEY = "mm-story";
 
-// Helper function to remove the last message (for removing loading state)
-function removeLastMessage() {
-  const content = textDisplay.innerHTML;
-  const lastBreakIndex = content.lastIndexOf("<br><br>");
-  if (lastBreakIndex !== -1) {
-    textDisplay.innerHTML = content.substring(0, lastBreakIndex);
+function saveStory() {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(story));
+  } catch {
+    // Storage may be unavailable; the story just won't survive a reload.
   }
 }
 
-// Download text as .txt file
-function downloadText() {
-  const htmlContent = textDisplay.innerHTML;
+function restoreStory() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY));
+    if (!Array.isArray(saved)) return;
+    for (const turn of saved) {
+      const isValid =
+        (turn?.role === "ai" || turn?.role === "human") && typeof turn.text === "string";
+      if (isValid) story.push(turn);
+    }
+  } catch {
+    // Nothing usable was saved.
+  }
+}
 
-  if (!htmlContent.trim()) {
-    alert("No text to download!");
+function wordCount() {
+  return story
+    .map((turn) => turn.text)
+    .join(" ")
+    .split(/\s+/)
+    .filter(Boolean).length;
+}
+
+function handleSubmit(event) {
+  event.preventDefault();
+  const text = input.value.trim();
+  if (!text || isBusy || failure) return;
+
+  story.push({ role: "human", text, card: drawnCard?.title });
+  turnCard = drawnCard;
+  setDrawnCard(null);
+  input.value = "";
+  requestAiTurn();
+}
+
+// Asks the server for the machine's next sentence (the opening, if the story is empty).
+async function requestAiTurn() {
+  isBusy = true;
+  failure = null;
+  render();
+
+  const body =
+    story.length === 0
+      ? { mode: "start" }
+      : {
+          mode: "continue",
+          story: story.map((turn) => turn.text),
+          cardId: turnCard?.id,
+        };
+
+  try {
+    const { text } = await MM.api("writer", body);
+    story.push({ role: "ai", text });
+    turnCard = null;
+  } catch (error) {
+    failure = { message: error.message };
+  } finally {
+    isBusy = false;
+    render();
+    if (!input.disabled) input.focus({ preventScroll: true });
+  }
+}
+
+// ---------- rendering ----------
+
+// Rebuilds the story from state. User text is added as text nodes, never as HTML.
+function render() {
+  saveStory();
+  storyElement.replaceChildren();
+  for (const turn of story) storyElement.append(turnElement(turn));
+
+  if (isBusy) {
+    const thinking = document.createElement("p");
+    thinking.className = "story__turn story__turn--thinking";
+    thinking.textContent = "AI is thinking…";
+    storyElement.append(thinking);
+  }
+
+  if (failure) {
+    const error = document.createElement("p");
+    error.className = "story__turn story__turn--error";
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.textContent = "Try again";
+    retry.addEventListener("click", requestAiTurn);
+    error.append(`Error: ${failure.message}`, retry);
+    storyElement.append(error);
+  }
+
+  // Keep the newest sentence in view, again after layout settles.
+  scroller.scrollTop = scroller.scrollHeight;
+  requestAnimationFrame(() => {
+    scroller.scrollTop = scroller.scrollHeight;
+  });
+  updateControls();
+}
+
+function turnElement(turn) {
+  const paragraph = document.createElement("p");
+  paragraph.className = `story__turn story__turn--${turn.role}`;
+
+  const role = document.createElement("strong");
+  role.textContent = turn.role === "ai" ? "AI:" : "You:";
+  paragraph.append(role, " ", turn.text);
+
+  if (turn.card) {
+    const tag = document.createElement("span");
+    tag.className = "story__card";
+    tag.textContent = `Wild card: ${turn.card}`;
+    paragraph.append(tag);
+  }
+  return paragraph;
+}
+
+// Shows the word count and locks the form once the story is full.
+function updateControls() {
+  const words = wordCount();
+  const isFull = words >= MAX_WORDS;
+
+  countElement.textContent = `${words} / ${MAX_WORDS} words`;
+  input.disabled = isFull;
+  input.placeholder = isFull ? "Maximum word count reached" : "";
+  sendButton.disabled = isFull || isBusy || Boolean(failure);
+  cardButton.disabled = isFull || isBusy;
+  form.classList.toggle("prompt--disabled", isFull);
+}
+
+// ---------- wild cards ----------
+
+async function drawCard() {
+  try {
+    if (allCards.length === 0) {
+      const response = await fetch("data/wildcards.json");
+      allCards = await response.json();
+    }
+  } catch {
+    MM.notice("Couldn't load the wild cards. Try again.", "error");
     return;
   }
 
-  // Convert HTML to plain text and clean up
-  const plainText = htmlContentToStory(htmlContent);
+  // Draw without repeats until every card has been seen, then reshuffle.
+  if (deck.length === 0) deck = shuffle(allCards);
+  setDrawnCard(deck.pop());
+}
 
-  // Create blob and download
-  const blob = new Blob([plainText], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
+function shuffle(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
 
-  // Create filename with date and time down to seconds
-  const now = new Date();
-  const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19); // YYYY-MM-DDTHH-MM-SS
+function setDrawnCard(card) {
+  drawnCard = card;
+  cardElement.hidden = !card;
+  if (!card) return;
 
-  // Create temporary download link
+  cardElement.querySelector(".wildcard__title").textContent = card.title;
+  cardElement.querySelector(".wildcard__text").textContent = card.human;
+  cardElement.querySelector(".wildcard__note").textContent = card.ai
+    ? "The machine gets a twist too."
+    : "";
+  input.focus();
+}
+
+// ---------- download ----------
+
+function downloadText() {
+  if (story.length === 0) {
+    MM.notice("No text to download yet!", "error");
+    return;
+  }
+
+  const text = story.map((turn) => turn.text).join(" ");
+  const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+
   const link = document.createElement("a");
   link.href = url;
-  link.download = `machine-madlib-${timestamp}.txt`;
-
-  // Trigger download
-  document.body.appendChild(link);
+  link.download = `machine-madlib-${MM.timestamp()}.txt`;
+  document.body.append(link);
   link.click();
-  // Clean up
-  document.body.removeChild(link);
+  link.remove();
   URL.revokeObjectURL(url);
 }
 
-// Convert HTML content to clean story text
-function htmlContentToStory(htmlContent) {
-  // First, remove HTML tags but preserve the structure for parsing
-  let cleanedHtml = htmlContent;
-
-  // Replace <br><br> with newlines to preserve separation
-  cleanedHtml = cleanedHtml.replace(/<br><br>/g, "\n\n");
-
-  // Create a temporary div to parse HTML
-  const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = cleanedHtml;
-
-  // Get text content and split by double line breaks
-  const textContent = tempDiv.textContent || tempDiv.innerText;
-  const sections = textContent.split("\n\n").filter((section) => section.trim());
-
-  // Process each section to remove roles and combine into story
-  const storyParts = [];
-
-  sections.forEach((section) => {
-    const trimmed = section.trim();
-
-    // Skip loading messages and errors
-    if (trimmed.includes("AI is thinking...") || trimmed.startsWith("Error:")) {
-      return;
-    }
-    // Remove role prefixes (You: or AI:) - now they come from the HTML content
-    let cleaned = trimmed;
-    if (cleaned.startsWith("You:")) {
-      cleaned = cleaned.substring(4).trim();
-    } else if (cleaned.startsWith("AI:")) {
-      cleaned = cleaned.substring(3).trim();
-    }
-
-    // Add to story if not empty
-    if (cleaned.trim()) {
-      storyParts.push(cleaned.trim());
-    }
-  });
-
-  // Join all parts into one cohesive story
-  return storyParts.join(" ");
-}
-
-// Start the app when DOM is ready
-document.addEventListener("DOMContentLoaded", init);
+init();

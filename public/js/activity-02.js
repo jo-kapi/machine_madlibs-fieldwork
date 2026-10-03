@@ -1,5 +1,6 @@
 // DOM Elements
 let saveButton,
+  sendButton,
   keywordForm,
   canvasBgForm,
   textColorForm,
@@ -9,8 +10,13 @@ let saveButton,
 
 // Initialize the app
 function init() {
+  // First-time visitors are sent to the join page.
+  if (!MM.requireIdentity()) return;
+  MM.initInfoPanels();
+
   // Cache DOM elements
   saveButton = document.querySelector(".save-btn");
+  sendButton = document.querySelector(".send-btn");
   keywordForm = document.querySelector("#form-keywords");
   canvasBgForm = document.querySelector("#form-canvas-bg");
   textColorForm = document.querySelector("#form-text-fg");
@@ -26,6 +32,7 @@ function init() {
 function setupEventListeners() {
   // Download button
   saveButton.addEventListener("click", downloadImage);
+  sendButton.addEventListener("click", sendToScreen);
 
   // Form submissions
   keywordForm.addEventListener("submit", handleKeywordSubmit);
@@ -42,78 +49,88 @@ function setupEventListeners() {
   fontToggle.addEventListener("click", handleFontToggle);
 }
 
+// Runs a request with the form's button disabled. Errors are shown on the page.
+async function runBusy(form, task) {
+  const button = form.querySelector("button");
+  button.disabled = true;
+  form.setAttribute("aria-busy", "true");
+  MM.clearNotice();
+  try {
+    await task();
+  } catch (error) {
+    MM.notice(error.message, "error");
+  } finally {
+    button.disabled = false;
+    form.removeAttribute("aria-busy");
+  }
+}
+
+// Returns the selected tile, or tells the person to select one.
+function requireActiveTile() {
+  const tile = wordTiles[activeTileIndex];
+  if (!tile) MM.notice("Select a word on the canvas first.");
+  return tile;
+}
+
 // Handle keyword form submission
-function handleKeywordSubmit(event) {
+async function handleKeywordSubmit(event) {
   event.preventDefault();
   const keywordInput = document.querySelector("#input-keyword");
   const keyword = keywordInput.value.trim();
-  keywordInput.value = "";
-  getWords(keyword);
+
+  await runBusy(keywordForm, async () => {
+    // An empty keyword asks for filler words (articles and prepositions).
+    const { words } = await MM.api("poet", { theme: keyword });
+    appendWords(words);
+    keywordInput.value = "";
+  });
 }
 
 // Handle canvas background form submission
-function handleCanvasBgSubmit(event) {
+async function handleCanvasBgSubmit(event) {
   event.preventDefault();
   const bgColorInput = document.querySelector("#canvas-bg");
   const bgColor = bgColorInput.value.trim();
-  if (bgColor) {
-    if (isValidHexColor(bgColor)) {
-      // Apply hex color directly
-      sketchBg = bgColor;
-      bgColorInput.value = "";
-    } else {
-      // Generate color from AI
-      generateColor(bgColor, (color) => {
-        sketchBg = color;
-        bgColorInput.value = "";
-      });
-    }
-  }
+  if (!bgColor) return;
+
+  await runBusy(canvasBgForm, async () => {
+    sketchBg = await resolveColor(bgColor);
+    bgColorInput.value = sketchBg;
+  });
 }
 
 // Handle text color form submission
-function handleTextColorSubmit(event) {
+async function handleTextColorSubmit(event) {
   event.preventDefault();
   const textColorInput = document.querySelector("#text-fg");
   const textColor = textColorInput.value.trim();
-  if (activeTileIndex !== null && textColor) {
-    if (isValidHexColor(textColor)) {
-      // Apply hex color directly
-      wordTiles[activeTileIndex].c = textColor;
-      textColorInput.value = "";
-    } else {
-      // Generate color from AI
-      generateColor(textColor, (color) => {
-        wordTiles[activeTileIndex].c = color;
-        textColorInput.value = "";
-      });
-    }
-  }
+  const tile = requireActiveTile();
+  if (!tile || !textColor) return;
+
+  // Keep hold of the tile itself: the selection may change while the machine thinks.
+  await runBusy(textColorForm, async () => {
+    tile.c = await resolveColor(textColor);
+    if (wordTiles[activeTileIndex] === tile) textColorInput.value = tile.c;
+  });
 }
 
 // Handle text background form submission
-function handleTextBgSubmit(event) {
+async function handleTextBgSubmit(event) {
   event.preventDefault();
   const textBgInput = document.querySelector("#text-bg");
   const textBg = textBgInput.value.trim();
-  if (activeTileIndex !== null && textBg) {
-    if (isValidHexColor(textBg)) {
-      // Apply hex color directly
-      wordTiles[activeTileIndex].bg = textBg;
-      textBgInput.value = "";
-    } else {
-      // Generate color from AI
-      generateColor(textBg, (color) => {
-        wordTiles[activeTileIndex].bg = color;
-        textBgInput.value = "";
-      });
-    }
-  }
+  const tile = requireActiveTile();
+  if (!tile || !textBg) return;
+
+  await runBusy(textBgForm, async () => {
+    tile.bg = await resolveColor(textBg);
+    if (wordTiles[activeTileIndex] === tile) textBgInput.value = tile.bg;
+  });
 }
 
 // Handle font size button clicks
 function handleFontSizeClick(e) {
-  if (activeTileIndex === null) return;
+  if (!requireActiveTile()) return;
 
   // Remove selection from all buttons
   fontSizeBtns.forEach((btn) => btn.classList.remove("selected"));
@@ -136,8 +153,8 @@ function handleFontSizeClick(e) {
 }
 
 // Handle font toggle button click
-function handleFontToggle(e) {
-  if (activeTileIndex === null) return;
+function handleFontToggle() {
+  if (!requireActiveTile()) return;
 
   const currentTile = wordTiles[activeTileIndex];
 
@@ -153,58 +170,6 @@ function handleFontToggle(e) {
   }
 }
 
-// Make request to Ollama for word generation
-function getWords(keyword) {
-  const model = "mm_poet";
-  const url = API;
-
-  const input = keyword || "mm_filler_words";
-
-  const request = {
-    model: model,
-    prompt: input,
-    stream: false,
-  };
-
-  fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(request),
-  })
-    .then(handleResponse)
-    .then(handleWordsData)
-    .catch(handleError);
-}
-
-// Handle fetch response
-function handleResponse(response) {
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return response.json();
-}
-
-// Handle successful word generation response
-function handleWordsData(data) {
-  const output = data.response;
-  let wordsArray = output.split(",").map((word) => word.trim());
-
-  // Limit to 8 words maximum
-  if (wordsArray.length > 8) {
-    wordsArray = wordsArray.slice(0, 8);
-  }
-
-  appendWords(wordsArray);
-}
-
-// Handle API errors
-function handleError(error) {
-  console.error("Error generating words:", error);
-  // Could add user-facing error message here
-}
-
 // Validate hex color format
 function isValidHexColor(color) {
   // Check if it starts with # and has valid hex format
@@ -212,62 +177,12 @@ function isValidHexColor(color) {
   return hexRegex.test(color);
 }
 
-// Generate color from AI using mm_color model
-function generateColor(colorDescription, callback) {
-  const model = "mm_color";
-  const url = API;
-
-  const request = {
-    model: model,
-    prompt: colorDescription,
-    stream: false,
-  };
-
-  fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(request),
-  })
-    .then(handleResponse)
-    .then((data) => {
-      const hexColor = sanitizeColorResponse(data.response);
-      if (hexColor) {
-        callback(hexColor);
-      } else {
-        console.error("Failed to extract valid hex color from AI response");
-        // Fallback to a default color
-        callback("#000000");
-      }
-    })
-    .catch((error) => {
-      console.error("Error generating color:", error);
-      // Fallback to a default color
-      callback("#000000");
-    });
-}
-
-// Sanitize AI response to extract only hex color
-function sanitizeColorResponse(response) {
-  // Remove any whitespace and convert to lowercase
-  const cleaned = response.trim().toLowerCase();
-
-  // Look for hex color patterns in the response
-  const hexMatch = cleaned.match(/#([a-f0-9]{6}|[a-f0-9]{3})/);
-
-  if (hexMatch) {
-    return hexMatch[0]; // Return the matched hex color
-  }
-
-  // If no # found, check if the response is just hex digits
-  const hexOnlyMatch = cleaned.match(/^([a-f0-9]{6}|[a-f0-9]{3})$/);
-  if (hexOnlyMatch) {
-    return "#" + hexOnlyMatch[0]; // Add # prefix
-  }
-
-  // If no valid hex found, return null
-  return null;
+// Hex codes apply directly. Anything else is described to the machine,
+// which answers with a hex code (or an error that the caller shows).
+async function resolveColor(text) {
+  if (isValidHexColor(text)) return text;
+  const { hex } = await MM.api("color", { description: text });
+  return hex;
 }
 
 // Append words to the word palette
@@ -374,12 +289,63 @@ function downloadImage() {
   // Clear selection before download
   activeTileIndex = null;
   clearEditor();
+  // Redraw first, so the selection outline isn't saved into the image.
+  redraw();
 
-  // Generate timestamped filename
-  const now = new Date();
-  const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+  saveCanvas(`mm_visual-poetry_${MM.timestamp()}`, "png");
+}
 
-  saveCanvas(`mm_visual-poetry_${timestamp}`, "png");
+// ---------- send to the shared screen ----------
+
+const MAX_SEND_SIDE = 1600; // pixels on the longest side
+const MAX_SEND_BYTES = 5 * 1024 * 1024;
+
+// The canvas as a PNG data URL, scaled down to fit the size limits.
+function canvasForSending() {
+  // Redraw first, so the selection outline isn't included.
+  activeTileIndex = null;
+  clearEditor();
+  redraw();
+
+  const source = document.querySelector(".preview canvas");
+  let scale = Math.min(1, MAX_SEND_SIDE / Math.max(source.width, source.height));
+
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const target = document.createElement("canvas");
+    target.width = Math.round(source.width * scale);
+    target.height = Math.round(source.height * scale);
+    target.getContext("2d").drawImage(source, 0, 0, target.width, target.height);
+
+    const dataUrl = target.toDataURL("image/png");
+    // Base64 text is about a third larger than the bytes it encodes.
+    if (dataUrl.length * 0.75 <= MAX_SEND_BYTES) return dataUrl;
+    scale *= 0.7;
+  }
+  throw new Error("The image is too large to send.");
+}
+
+// Sends the canvas to the host's gallery, captioned with your name and pronouns
+// (the server adds those from your join details).
+async function sendToScreen() {
+  sendButton.disabled = true;
+  MM.clearNotice();
+  try {
+    const image = canvasForSending();
+    const send = () => MM.api("gallery", { id: MM.getIdentity().id, image });
+    try {
+      await send();
+    } catch (error) {
+      // The server forgets people when it restarts: join again, then retry once.
+      if (!/join first/i.test(error.message)) throw error;
+      await MM.joinSession(MM.getIdentity());
+      await send();
+    }
+    MM.notice("Sent to the big screen!");
+  } catch (error) {
+    MM.notice(error.message, "error");
+  } finally {
+    sendButton.disabled = false;
+  }
 }
 
 // Start the app when DOM is ready

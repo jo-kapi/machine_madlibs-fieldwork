@@ -1,35 +1,76 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Machine Madlibs – SOAI '25' | Activity 01 – Micro-fictions</title>
+    <title>Machine Madlibs – field:work | Activity 01 – Micro-fictions</title>
     <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/layout.css" />
     <link rel="stylesheet" href="css/activity-01.css" />
   </head>
-  <body>
-    <header>
-      <h1>Machine Madlibs</h1>
-      <nav>
+  <body class="page--fit">
+    <header class="site-header">
+      <h1>Machine Madlibs <span class="site-header__event">field:work</span></h1>
+      <nav class="site-nav">
         <a href="activity_01.html" class="active">Activity 01</a>
         <a href="activity_02.html">Activity 02</a>
+        <a href="activity_03.html">Activity 03</a>
       </nav>
       <button class="save-btn">↓ Download Text</button>
     </header>
+
+    <div class="info">
+      <details class="info__panel" data-remember="activity-01" open>
+        <summary>How this works</summary>
+        <div class="info__body">
+          <ol>
+            <li>The machine opens a story with one sentence.</li>
+            <li>Write the next sentence. The machine answers with the one after that.</li>
+            <li>
+              Keep trading sentences until the story reaches
+              <span data-max-words>350</span> words.
+            </li>
+            <li>Stuck? Draw a wild card for a twist.</li>
+            <li>Download your story when you're done.</li>
+          </ol>
+        </div>
+      </details>
+      <details class="info__panel" data-peek="writer">
+        <summary>Peek at the system prompt</summary>
+        <div class="info__body"></div>
+      </details>
+    </div>
+
+    <p class="notice" role="status" hidden></p>
+
     <main>
       <section class="activity-01">
         <div class="text-display">
-          <p></p>
+          <div class="story" aria-live="polite"></div>
         </div>
-        <form action="submit" class="prompt">
-          <input type="text" />
-          <button>↑</button>
+
+        <aside class="wildcard" hidden>
+          <div class="wildcard__content">
+            <p class="wildcard__title"></p>
+            <p class="wildcard__text"></p>
+            <p class="wildcard__note"></p>
+          </div>
+          <button type="button" class="wildcard__dismiss" aria-label="Put the card back">
+            ×
+          </button>
+        </aside>
+
+        <form class="prompt">
+          <button type="button" class="prompt__card">Wild card</button>
+          <input type="text" maxlength="400" aria-label="Your next sentence" />
+          <button type="submit" class="prompt__send" aria-label="Send">↑</button>
         </form>
+        <p class="word-count"></p>
       </section>
     </main>
-    <script src="js/config.js"></script>
+
+    <script src="js/common.js"></script>
     <script src="js/activity-01.js"></script>
   </body>
 </html>

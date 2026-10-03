@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Machine Madlibs – field:work | Join</title>
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/join.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>Machine Madlibs <span class="site-header__event">field:work</span></h1>
+    </header>
+    <main class="join">
+      <form class="join__form" novalidate>
+        <h2 class="join__title">Welcome</h2>
+        <p>
+          Tell us who you are. Your name appears on the shared screen next to anything you
+          send to it.
+        </p>
+
+        <label class="join__field">
+          <span class="join__label">Name</span>
+          <input
+            type="text"
+            name="name"
+            maxlength="40"
+            autocomplete="given-name"
+            autofocus
+            required
+          />
+        </label>
+
+        <label class="join__field">
+          <span class="join__label">Pronouns <small>(optional)</small></span>
+          <input
+            type="text"
+            name="pronouns"
+            maxlength="30"
+            placeholder="e.g. she/her, he/him, they/them"
+          />
+        </label>
+
+        <p class="join__note">
+          Kept in memory on the host's computer for this session only. Pronouns appear
+          beside your name on the shared screen, never on the leaderboard.
+        </p>
+
+        <button type="submit" class="join__submit">Join</button>
+        <p class="notice" role="status" hidden></p>
+      </form>
+    </main>
+    <script src="js/common.js"></script>
+    <script src="js/join.js"></script>
+  </body>
+</html>

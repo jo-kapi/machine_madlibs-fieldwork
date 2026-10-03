@@ -4,19 +4,50 @@ let activeTileIndex = null;
 let sketchBg;
 let isDragging = false;
 let offsetX, offsetY;
+let selectionColor;
+let sansFont;
+let serifFont;
+
+// The canvas is the largest square that fits its container.
+function canvasSize() {
+  const parent = document.querySelector(".preview");
+  return Math.floor(Math.min(parent.clientWidth, parent.clientHeight));
+}
 
 // p5.js setup function
 function setup() {
   const parentElement = document.querySelector(".preview");
-  let parentWidth = parentElement.clientWidth;
-  let parentHeight = parentElement.clientHeight;
-  let canvasSize = Math.min(parentWidth, parentHeight);
+  const canvasSizeValue = canvasSize();
 
-  let canvas = createCanvas(canvasSize, canvasSize);
+  let canvas = createCanvas(canvasSizeValue, canvasSizeValue);
   canvas.parent(parentElement);
 
   sketchBg = color(230);
   background(sketchBg);
+
+  // The selection colour comes from the design tokens in css/tokens.css.
+  const tokens = getComputedStyle(document.documentElement);
+  selectionColor = tokens.getPropertyValue("--color-selection").trim() || "#ff3b5b";
+  // Tiles use the same fonts as the rest of the app.
+  sansFont = tokens.getPropertyValue("--font-ui").trim() || "Arial";
+  serifFont = tokens.getPropertyValue("--font-serif").trim() || "Georgia";
+
+  // Refit whenever the container's size changes: a resized window, a collapsed
+  // instructions panel, a rotated tablet.
+  new ResizeObserver(fitCanvas).observe(parentElement);
+}
+
+// Fits the canvas to its container, moving tiles with it.
+function fitCanvas() {
+  const newSize = canvasSize();
+  if (newSize < 1 || Math.abs(newSize - width) < 2) return;
+
+  const scale = newSize / width;
+  wordTiles.forEach((tile) => {
+    tile.x *= scale;
+    tile.y *= scale;
+  });
+  resizeCanvas(newSize, newSize);
 }
 
 // p5.js draw function
@@ -27,11 +58,7 @@ function draw() {
     const tile = wordTiles[i];
 
     // Set font family based on tile font property
-    if (tile.font === "serif") {
-      textFont("Georgia");
-    } else {
-      textFont("Arial");
-    }
+    textFont(tile.font === "serif" ? serifFont : sansFont);
 
     textSize(tile.sz);
     textAlign(CENTER, CENTER);
@@ -46,7 +73,7 @@ function draw() {
     // Draw tile background
     fill(tile.bg);
     if (i === activeTileIndex) {
-      stroke("#ff3b5b");
+      stroke(selectionColor);
       strokeWeight(2);
     } else {
       noStroke();
@@ -60,45 +87,51 @@ function draw() {
   }
 }
 
-// p5.js mouse interaction functions
-function mousePressed() {
-  // Check if mouse is within canvas bounds
-  if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height) {
-    return;
+// Selects the top-most tile at (x, y) and starts dragging it.
+// Returns true if a tile was hit.
+function pressAt(x, y) {
+  // Check if the pointer is within canvas bounds
+  if (x < 0 || x > width || y < 0 || y > height) {
+    return false;
   }
 
-  // Start from the top-most tile and check if mouse is within bounds
+  // Start from the top-most tile and check if the pointer is within bounds
   for (let i = wordTiles.length - 1; i >= 0; i--) {
     const tile = wordTiles[i];
-    if (
-      mouseX > tile.x &&
-      mouseX < tile.x + tile.w &&
-      mouseY > tile.y &&
-      mouseY < tile.y + tile.h
-    ) {
+    if (x > tile.x && x < tile.x + tile.w && y > tile.y && y < tile.y + tile.h) {
       activeTileIndex = i;
       isDragging = true;
       // Calculate offset for smooth dragging
-      offsetX = mouseX - tile.x;
-      offsetY = mouseY - tile.y;
+      offsetX = x - tile.x;
+      offsetY = y - tile.y;
       // Update editor with current tile properties
       updateEditor(wordTiles[activeTileIndex]);
-      return;
+      return true;
     }
   }
 
-  // If no tile was clicked, clear selection
+  // If no tile was hit, clear selection
   activeTileIndex = null;
   clearEditor();
+  return false;
 }
 
-function mouseDragged() {
+function dragTo(x, y) {
   if (isDragging && activeTileIndex !== null) {
     const tile = wordTiles[activeTileIndex];
     // Update tile position, keeping it within canvas bounds
-    tile.x = Math.max(0, Math.min(width - tile.w, mouseX - offsetX));
-    tile.y = Math.max(0, Math.min(height - tile.h, mouseY - offsetY));
+    tile.x = Math.max(0, Math.min(width - tile.w, x - offsetX));
+    tile.y = Math.max(0, Math.min(height - tile.h, y - offsetY));
   }
+}
+
+// Mouse and touch. Since p5 2.0, touches arrive through these same functions.
+function mousePressed() {
+  pressAt(mouseX, mouseY);
+}
+
+function mouseDragged() {
+  dragTo(mouseX, mouseY);
 }
 
 function mouseReleased() {

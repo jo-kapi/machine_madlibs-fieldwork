@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Machine Madlibs – field:work | Host</title>
+    <link rel="stylesheet" href="/css/normalize.css" />
+    <link rel="stylesheet" href="/css/tokens.css" />
+    <link rel="stylesheet" href="host.css" />
+  </head>
+  <body class="host">
+    <header class="host__bar">
+      <span class="host__brand">Machine Madlibs <small>field:work</small></span>
+      <nav class="host__tabs">
+        <button type="button" data-view="game" class="host__tab host__tab--active">
+          Temp Check
+        </button>
+        <button type="button" data-view="gallery" class="host__tab">
+          Gallery <span class="host__badge" hidden></span>
+        </button>
+      </nav>
+      <span class="host__round"></span>
+    </header>
+
+    <main class="host__stage"></main>
+
+    <main class="host__gallery" hidden>
+      <p class="host__sub gallery__empty">
+        Nothing here yet. Poems sent from Activity 02 appear here.
+      </p>
+      <div class="gallery__grid"></div>
+    </main>
+
+    <div class="lightbox" hidden>
+      <img class="lightbox__image" alt="" />
+      <p class="lightbox__caption"></p>
+      <p class="lightbox__hint">
+        <kbd>←</kbd><kbd>→</kbd> browse · <kbd>Esc</kbd> close · <kbd>Delete</kbd> remove
+        · <kbd>F</kbd> fullscreen
+      </p>
+      <button type="button" class="lightbox__delete">Delete</button>
+    </div>
+
+    <aside class="host__peek" hidden>
+      <div class="host__peek-body"></div>
+    </aside>
+
+    <p class="host__notice" role="status" hidden></p>
+
+    <footer class="host__controls">
+      <span class="host__hint host__hint--game">
+        <kbd>Space</kbd> next · <kbd>↑</kbd><kbd>↓</kbd> temperature · <kbd>R</kbd> redo ·
+        <kbd>P</kbd> system prompt · <kbd>G</kbd> gallery · <kbd>F</kbd> fullscreen
+      </span>
+      <span class="host__hint host__hint--gallery" hidden>
+        <kbd>Enter</kbd> open · <kbd>←</kbd><kbd>→</kbd> browse · <kbd>Delete</kbd> remove
+        · <kbd>T</kbd> game · <kbd>F</kbd> fullscreen
+      </span>
+      <span class="host__buttons">
+        <button type="button" data-action="next">Next</button>
+        <button type="button" data-action="redo">Redo round</button>
+        <button type="button" data-action="reset">Restart game</button>
+      </span>
+    </footer>
+
+    <script src="/js/common.js"></script>
+    <script src="gallery.js"></script>
+    <script src="host.js"></script>
+  </body>
+</html>
