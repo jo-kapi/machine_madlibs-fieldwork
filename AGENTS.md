@@ -76,14 +76,16 @@ These are the privacy and safety promises the README makes to participants.
 ## Recipes
 
 - **Change what the machine is told:** edit `server/prompts.js`. The "peek at the system
-  prompt" panels read from the same object, so they stay accurate.
+  prompt" sheet reads from the same object, so it stays accurate. Its plain-language notes
+  (what each prompt and setting means) are in `public/data/peek.json`.
 - **Edit wild cards, instruction cards, stems or Temp Check rounds:** edit the JSON files in
   `public/data/`.
   They are read when used, so no restart is needed.
 - **Change the look:** edit `public/css/tokens.css`.
 - **Add an activity:** add a page in `public/`, add its prompts to `prompts.js`, add a
   function in `server/activities.js` and a route in `server/api.js`, then add a nav link
-  and a peek panel on the page.
+  and a peek button (`class="peek__trigger" data-peek="..."`) on the page, with a note for
+  each prompt in `public/data/peek.json`.
 - **Add or change a setting:** add it to `server/config.js` with a default, then to
   `.env.example` and the settings table in the README.
 

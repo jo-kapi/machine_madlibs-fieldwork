@@ -32,12 +32,12 @@ const Instructions = (() => {
   function build(content, values) {
     const dialog = MM.el("dialog", "help");
     const card = MM.el("form", "help__card");
-    card.method = "dialog"; // pressing the button closes the dialog
+    card.method = "dialog"; // without the script below, pressing the button still closes it
 
     const steps = MM.el("ol", "help__steps");
     for (const step of content.steps) steps.append(MM.el("li", "", fill(step, values)));
 
-    const close = MM.el("button", "help__close", "Got it");
+    const close = MM.el("button", "btn btn--primary help__close", "Got it");
     card.append(
       MM.el("h2", "help__title", content.title),
       MM.el("p", "help__intro", fill(content.intro, values)),
@@ -48,16 +48,24 @@ const Instructions = (() => {
     card.append(close);
     dialog.append(card);
 
-    // Clicking the dimmed area around the card closes it.
+    // The button, Esc and a click on the dimmed area all close it with a fade.
+    card.addEventListener("submit", (event) => {
+      event.preventDefault();
+      MM.closeDialog(dialog);
+    });
+    dialog.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      MM.closeDialog(dialog);
+    });
     dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) dialog.close();
+      if (event.target === dialog) MM.closeDialog(dialog);
     });
     return dialog;
   }
 
   // `key` picks the wording from data/instructions.json.
   async function init(key, values = {}) {
-    const button = document.querySelector(".help-btn");
+    const button = document.querySelector(".site-header__help");
 
     let content;
     try {

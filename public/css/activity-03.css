@@ -49,7 +49,7 @@
 }
 
 .temp__link {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   font-size: 1.1rem;
 }
 
@@ -74,7 +74,7 @@
 
   &.mode--match {
     background: var(--color-accent-soft);
-    color: var(--color-accent);
+    color: var(--color-accent-text);
   }
 
   &.mode--beat {

@@ -26,7 +26,7 @@ const BEAT_OUTCOMES = {
 
 function init() {
   if (!MM.requireIdentity()) return;
-  MM.initInfoPanels();
+  Peek.init();
   Instructions.init("activity-03");
   setInterval(tick, 100);
   connect();

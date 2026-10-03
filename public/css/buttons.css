@@ -1,0 +1,78 @@
+/* BUTTONS
+   .btn is an outlined pill. Add a modifier for the other kinds:
+     .btn--primary  the main action on a page, filled with the accent
+     .btn--icon     round, holding one symbol such as ?, ↑ or ✱
+     .btn--large    the taller size used in the prompt bar
+     .btn--close    a small, quiet round button for closing a card or sheet */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 2.4rem;
+  padding-inline: var(--space-md);
+  border: solid thin var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: transparent;
+
+  color: var(--color-text);
+  font-size: var(--text-md);
+
+  cursor: pointer;
+  transition: all var(--transition);
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-text);
+    background: var(--color-surface-hover);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &[hidden] {
+    display: none;
+  }
+
+  &.btn--primary {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-invert-bg);
+      background: var(--color-invert-bg);
+      color: var(--color-invert-text);
+    }
+  }
+
+  &.btn--icon {
+    width: 2.4rem;
+    padding: 0;
+  }
+
+  &.btn--large {
+    min-height: 3rem;
+
+    &.btn--icon {
+      width: 3rem;
+    }
+  }
+
+  &.btn--close {
+    width: 2rem;
+    min-height: 2rem;
+    padding: 0;
+    border-color: transparent;
+    color: var(--color-text-muted);
+    font-size: var(--text-xl);
+    line-height: 1;
+
+    &:hover:not(:disabled) {
+      border-color: transparent;
+      background: var(--color-surface-hover);
+      color: var(--color-text);
+    }
+  }
+}

@@ -1,6 +1,9 @@
 /* MICRO-FICTION STYLES */
 
 .activity-01 {
+  /* One column holds the story, the wild card and the prompt, so their edges line up. */
+  --column: 44rem;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -9,63 +12,200 @@
   width: 100%;
 }
 
-.text-display {
+.story-scroller {
   display: flex;
   justify-content: center;
 
   flex: 1;
   min-height: 0;
   width: 100%;
-  padding-top: 1.5em;
-  margin-bottom: 1rem;
+  /* The side padding leaves room for the labels hanging in the margin: a scrolling
+     box clips anything outside its padding. */
+  padding: var(--space-lg) var(--space-lg) 0;
+  margin-bottom: var(--space-md);
 
   overflow-y: auto;
 
-  font-size: 1.75rem;
-  line-height: 1.5em;
+  font-size: var(--text-xl);
+  line-height: var(--leading-prose);
+
+  /* Narrow screens have no margin to hang labels in (see .story__turn), so the story
+     takes the full width, like the prompt. */
+  @media (max-width: 800px) {
+    padding-inline: 0;
+  }
 }
 
 .story {
+  /* Each turn's "AI" or "You" label hangs in the left margin, so the text itself is
+     exactly as wide as the prompt below it. */
+  --label: 3rem;
+  --gutter: var(--space-lg); /* space between a label and its text */
+
   width: 100%;
-  max-width: 800px;
+  max-width: var(--column);
 }
 
+/* One turn: a label in the margin, then the sentence. Below 800px wide (a media query
+   can't read the variables above) there is no room in the margin, so the label sits
+   above the sentence instead. */
 .story__turn {
-  margin: 0 0 1em;
+  display: grid;
+  grid-template-columns: var(--label) 1fr;
+  column-gap: var(--gutter);
+  align-items: baseline;
 
-  &.story__turn--thinking {
-    color: var(--color-text-muted);
-    font-style: italic;
+  width: calc(100% + var(--label) + var(--gutter));
+  margin: 0 0 1em calc(-1 * (var(--label) + var(--gutter)));
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+    row-gap: var(--space-xs);
+    width: 100%;
+    margin-left: 0;
   }
 
   &.story__turn--error {
+    display: block;
+    width: auto;
+    margin-left: 0;
     color: var(--color-error);
-    font-size: 0.7em;
+    font-size: var(--text-lg);
     line-height: 1.5;
   }
 
   & button {
     margin-left: 0.75em;
-    padding: 0.25em 0.75em;
+    padding: 0.25em 0.9em;
     border: solid thin var(--color-error);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-pill);
     background: transparent;
     color: var(--color-error);
+    font-size: var(--text-md);
     cursor: pointer;
   }
 }
 
-/* Which wild card words were in play for a sentence. */
-.story__card {
-  display: block;
-  margin-top: 0.25em;
-  color: var(--color-accent);
+/* The label sits at the right edge of its column, next to the text. Your own label is
+   enclosed in the accent; the machine's is plain, with the same padding so the two line up. */
+.story__speaker {
+  justify-self: end;
+  padding: 0.1em 0.6em;
+  border-radius: var(--radius-sm);
+
+  color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 0.5em;
-  line-height: 1.4;
+  font-size: var(--text-sm);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  @media (max-width: 800px) {
+    justify-self: start;
+  }
 }
 
-/* WILD CARD */
+.story__turn--human .story__speaker {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* Above the sentence, the machine's label starts at the sentence's left edge. */
+.story__turn--ai .story__speaker {
+  @media (max-width: 800px) {
+    padding-inline: 0;
+  }
+}
+
+/* THINKING: three dots that bounce in turn while the machine writes. */
+.story__dots {
+  color: var(--color-text-muted);
+}
+
+/* Inline blocks sit on the text baseline, like full stops. */
+.story__dot {
+  display: inline-block;
+  width: 0.3em;
+  height: 0.3em;
+  border-radius: 50%;
+  background: currentColor;
+  animation: story-bounce 1.2s ease-in-out infinite;
+
+  & + & {
+    margin-left: 0.3em;
+  }
+
+  &:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  /* Still dots are enough for people who prefer less motion. */
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes story-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+
+  30% {
+    transform: translateY(-0.5em);
+    opacity: 1;
+  }
+}
+
+/* The wild card that went with a sentence, under it: its words as small chips, with the
+   ones the sentence used lit up and the rest of the hand kept quiet. */
+.story__card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  grid-column: 2;
+  gap: var(--space-xs) 0.4rem;
+  margin-top: var(--space-sm);
+
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+
+  @media (max-width: 800px) {
+    grid-column: 1;
+  }
+}
+
+.story__card-icon {
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.2rem;
+  color: var(--color-accent-text);
+}
+
+.story__chip {
+  padding: 0.15em 0.7em;
+  border: solid thin var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+.story__chip--used {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+}
+
+/* WILD CARD
+   Slides up and fades in when drawn, and plays backwards when put away. Without
+   .wildcard--open it is faded out and a little lower; the script adds and removes
+   that class. */
 .wildcard {
   display: flex;
   justify-content: space-between;
@@ -73,16 +213,38 @@
   gap: var(--space-md);
 
   width: 100%;
-  max-width: 900px;
-  margin-bottom: var(--space-sm);
-  padding: 0.75rem 1rem;
-  border: solid thin var(--color-accent-border);
+  max-width: var(--column);
+  margin-bottom: var(--space-md);
+  padding: var(--space-lg);
+  border: solid thin var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-accent-soft);
+  background: var(--color-surface);
+
+  opacity: 0;
+  transform: translateY(1rem);
+  transition:
+    opacity var(--transition) var(--ease-out),
+    transform var(--transition) var(--ease-out);
+
+  &.wildcard--open {
+    opacity: 1;
+    transform: none;
+  }
 
   &[hidden] {
     display: none;
   }
+
+  /* People who prefer less motion still get the fade, just not the slide. */
+  @media (prefers-reduced-motion: reduce) {
+    transform: none;
+  }
+}
+
+.wildcard__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 
   & p {
     margin: 0;
@@ -90,41 +252,57 @@
 }
 
 .wildcard__label {
-  color: var(--color-accent);
+  color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-weight: 500;
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 /* The card's five words and phrases, as chips. */
 .wildcard__words {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0.5rem 0;
+  gap: var(--space-sm) 0.6rem;
+  margin: 0;
   padding: 0;
   list-style: none;
+}
 
-  & li {
-    padding: 0.3em 0.8em;
-    border: solid thin var(--color-accent-border);
-    border-radius: var(--radius-pill);
-    background: var(--color-bg);
-    font-size: 1.2em;
+/* Each chip is a button: it adds its words to your sentence at the cursor. */
+.wildcard__word {
+  padding: 0.4em 1.1em;
+  border: solid thin var(--color-accent);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+  font-size: var(--text-lg);
+  cursor: pointer;
+  transition: all var(--transition);
+
+  &:hover:not(:disabled) {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  /* Already in your sentence. */
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
   }
 }
 
 .wildcard__note {
   color: var(--color-text-muted);
-  font-size: 0.9em;
+  font-size: var(--text-sm);
+  line-height: 1.5;
 }
 
+/* The close button (a .btn--close) hangs slightly into the corner, so the cross lines up
+   with the label. */
 .wildcard__dismiss {
-  border: none;
-  background: transparent;
-  color: var(--color-accent);
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
+  flex-shrink: 0;
+  margin: calc(-1 * var(--space-xs)) calc(-1 * var(--space-xs)) 0 0;
 }
 
 /* PROMPT */
@@ -133,42 +311,30 @@
   grid-template-columns: auto 1fr auto;
   align-items: center;
 
-  gap: 1rem;
+  gap: var(--space-sm);
   width: 100%;
-  max-width: 900px;
+  max-width: var(--column);
   height: 3rem;
 
+  /* Inputs under 16px make iOS zoom the page when they are focused. */
   font-size: 16px;
 
   & input {
     height: 100%;
+    padding-inline: var(--space-md);
+    border: solid thin var(--color-border-strong);
     border-radius: var(--radius-pill);
-    border: solid thin var(--color-border);
-    padding-block: 0.5rem;
-    padding-inline: 1rem;
-    transition: border var(--transition);
-
-    &:focus {
-      border-color: var(--color-border-strong);
-    }
-  }
-
-  & button {
-    height: 3rem;
-    border: none;
-    border-radius: var(--radius-pill);
-    background: var(--color-border);
+    background: var(--color-bg);
     color: var(--color-text);
-    transition: all var(--transition);
-    cursor: pointer;
+    transition: border-color var(--transition);
 
-    &:hover:not(:disabled) {
-      background: var(--color-invert-bg);
-      color: var(--color-invert-text);
+    /* The border is the only focus indicator, so there is no second ring. */
+    &:focus {
+      outline: none;
+      border-color: var(--color-text);
     }
 
     &:disabled {
-      opacity: 0.5;
       cursor: not-allowed;
     }
   }
@@ -176,23 +342,24 @@
   &.prompt--disabled {
     opacity: 0.5;
   }
-}
 
-.prompt__card {
-  padding-inline: 1.25rem;
-  font-size: 1rem;
-}
+  /* The wild card button holds an asterisk, and send holds an arrow (both .btn). */
+  & .prompt__card svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 
-.prompt__send {
-  width: 3rem;
-  font-size: 20px;
+  & .prompt__send {
+    font-size: 20px;
+  }
 }
 
 .word-count {
   width: 100%;
-  max-width: 900px;
+  max-width: var(--column);
   margin: var(--space-sm) 0 0;
   color: var(--color-text-muted);
   font-family: var(--font-mono);
+  font-size: var(--text-sm);
   text-align: right;
 }

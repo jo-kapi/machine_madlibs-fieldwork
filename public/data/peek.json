@@ -1,0 +1,27 @@
+{
+  "intro": "This is exactly what the machine is told, and how it is set up. It lives on the host's computer, so nothing in your browser can change it.",
+  "prompts": {
+    "writer": {
+      "start": "Used once, to write the story's opening line.",
+      "continue": "Used every time the machine answers one of your sentences."
+    },
+    "poet": {
+      "words": "Turns your theme into the words that land on the canvas.",
+      "filler": "Used when the theme is left blank: little words like “the” and “of”."
+    },
+    "color": {
+      "hex": "Turns a colour you describe, like “burnt orange”, into a hex code."
+    },
+    "temp": {
+      "sample": "Asked many times each round, to see how much the machine's answers vary."
+    }
+  },
+  "lengths": "One of these lines is added at random each turn, so sentences swing between short and long.",
+  "twist": "Added after the story when you have drawn a wild card. {words} becomes the card's words that you haven't used yet, so the machine picks a different one.",
+  "settings": {
+    "temperature": "How adventurous the machine is. Low sticks to the safest word; high takes risks.",
+    "num_predict": "The longest reply allowed, counted in tokens (small chunks of words).",
+    "top_p": "A filter on likely words. At 1, nothing is filtered out.",
+    "top_k": "A cap on how many candidate words are considered. At 0, there is no cap."
+  }
+}

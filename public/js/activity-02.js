@@ -12,12 +12,12 @@ let saveButton,
 function init() {
   // First-time visitors are sent to the join page.
   if (!MM.requireIdentity()) return;
-  MM.initInfoPanels();
+  Peek.init();
   Instructions.init("activity-02");
 
   // Cache DOM elements
-  saveButton = document.querySelector(".save-btn");
-  sendButton = document.querySelector(".send-btn");
+  saveButton = document.querySelector(".toolbar__download");
+  sendButton = document.querySelector(".toolbar__send");
   keywordForm = document.querySelector("#form-keywords");
   canvasBgForm = document.querySelector("#form-canvas-bg");
   textColorForm = document.querySelector("#form-text-fg");

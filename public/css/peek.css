@@ -1,0 +1,235 @@
+/* PEEK SHEET
+   "Peek at the system prompt": a trigger button in the toolbar, and a sheet that slides
+   in from the right edge. The sheet is built by js/peek.js. */
+
+.peek__trigger {
+  padding: 0.5em 1em;
+  border: solid thin var(--color-border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+
+  &:hover {
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
+  }
+}
+
+/* THE SHEET
+   A native <dialog>, so the page behind is inert and Esc closes it. It opens from the left
+   edge, on the same side as the button that opens it, with square corners. The dimmed
+   backdrop, and its fade, are shared with the other dialogs (see layout.css). */
+.peek {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: min(30rem, 100vw);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  border-right: solid thin var(--color-border);
+  border-radius: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  box-shadow: 1rem 0 3rem rgb(0 0 0 / 0.15);
+
+  /* Slides in a little and fades; closing plays the same thing backwards. The script
+     adds .dialog--closing and closes the dialog when that animation ends. */
+  @media (prefers-reduced-motion: no-preference) {
+    &[open] {
+      animation: peek-in 320ms var(--ease-out);
+    }
+
+    &.dialog--closing {
+      animation: peek-out 200ms ease-in forwards;
+    }
+  }
+}
+
+@keyframes peek-in {
+  from {
+    opacity: 0;
+    transform: translateX(-2.5rem);
+  }
+}
+
+@keyframes peek-out {
+  to {
+    opacity: 0;
+    transform: translateX(-2.5rem);
+  }
+}
+
+/* The header stays put; only the body scrolls. */
+.peek__sheet {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.peek__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-bottom: solid thin var(--color-border);
+
+  /* The close button (a .btn--close) keeps its size beside a long title. */
+  & .btn {
+    flex-shrink: 0;
+  }
+}
+
+.peek__eyebrow {
+  margin: 0 0 var(--space-xs);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.peek__title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.peek__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  overflow-y: auto;
+}
+
+.peek__status {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.peek__intro {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: var(--leading-prose);
+}
+
+/* THE MODEL */
+.peek__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.peek__meta-label {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.peek__tag {
+  padding: 0.2em 0.75em;
+  border: solid thin var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+
+  /* A value that changes while the app runs. */
+  &.peek__tag--live {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+}
+
+/* ONE PROMPT: a label, what it is for, the text, then extras and settings */
+.peek__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding-top: var(--space-lg);
+  border-top: solid thin var(--color-border);
+}
+
+.peek__label {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.peek__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.peek__text {
+  margin: 0;
+  padding: var(--space-md);
+  border: solid thin var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.peek__extra {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.peek__sublabel {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* The settings: a chip with the name and value, and a plain-language note beside it. */
+.peek__settings {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: var(--space-sm) var(--space-md);
+  margin: 0;
+
+  & dd {
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+}
+
+.peek__chip {
+  display: inline-flex;
+  gap: 0.6em;
+  padding: 0.2em 0.75em;
+  border: solid thin var(--color-border);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.peek__chip-name {
+  color: var(--color-text-muted);
+}

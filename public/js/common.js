@@ -1,5 +1,5 @@
 // Helpers shared by every page: talking to the server, who you are,
-// on-page messages and the collapsible info panels.
+// on-page messages and small helpers.
 // Everything lives on one global object, MM, so it works next to p5's globals.
 const MM = (() => {
   const IDENTITY_KEY = "mm-identity";
@@ -95,73 +95,78 @@ const MM = (() => {
     if (element) element.hidden = true;
   }
 
-  // ---------- info panels ----------
+  // ---------- dialogs ----------
 
-  // Draws one activity's system prompts and sampling options into `body`.
-  function renderPrompts(body, data) {
-    body.replaceChildren();
-
-    const model = document.createElement("p");
-    model.textContent = `Model: ${data.model}`;
-    body.append(model);
-
-    // Values that change while the app runs, such as Temp Check's temperature.
-    if (data.live) {
-      const live = document.createElement("p");
-      live.textContent = Object.entries(data.live)
-        .map(([name, value]) => `Current ${name}: ${value ?? "not set yet"}`)
-        .join(" · ");
-      body.append(live);
+  // Closes a <dialog> after its fade-out has played. Adding "dialog--closing" starts the
+  // closing animations in the CSS; the dialog is closed when they are done. People who
+  // prefer less motion get no animation, so there is nothing to wait for.
+  function closeDialog(dialog) {
+    const prefersLessMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersLessMotion || !dialog.open) {
+      dialog.close();
+      return;
     }
+    if (dialog.classList.contains("dialog--closing")) return;
 
-    for (const prompt of Object.values(data.prompts)) {
-      const heading = document.createElement("h4");
-      heading.textContent = prompt.label;
-      const system = document.createElement("pre");
-      system.textContent = prompt.system;
-      body.append(heading, system);
-
-      if (prompt.twist) {
-        const twist = document.createElement("pre");
-        twist.textContent = `With a wild card, this is added after the story:\n${prompt.twist}`;
-        body.append(twist);
-      }
-
-      if (prompt.lengths) {
-        const lengths = document.createElement("pre");
-        lengths.textContent = `Each turn, one of these is added at random:\n${prompt.lengths.join("\n")}`;
-        body.append(lengths);
-      }
-
-      const options = document.createElement("dl");
-      for (const [name, value] of Object.entries(prompt.options)) {
-        const term = document.createElement("dt");
-        term.textContent = name;
-        const detail = document.createElement("dd");
-        detail.textContent = value;
-        options.append(term, detail);
-      }
-      body.append(options);
-    }
+    dialog.classList.add("dialog--closing");
+    const finish = (event) => {
+      // Animations on the backdrop also report here; the dialog's own one is the cue.
+      if (event?.pseudoElement) return;
+      dialog.removeEventListener("animationend", finish);
+      clearTimeout(fallback);
+      dialog.classList.remove("dialog--closing");
+      dialog.close();
+    };
+    const fallback = setTimeout(finish, 600); // in case no animation ever runs
+    dialog.addEventListener("animationend", finish);
   }
 
-  // Wires up the "peek at the system prompt" panels (<details class="info__panel">):
-  // each loads the live system prompt for its data-peek="activity" when first opened.
-  function initInfoPanels() {
-    for (const panel of document.querySelectorAll(".info__panel")) {
-      panel.addEventListener("toggle", async () => {
-        const activity = panel.dataset.peek;
-        if (!activity || !panel.open || panel.dataset.loaded) return;
-        const body = panel.querySelector(".info__body");
-        body.textContent = "Loading…";
-        try {
-          renderPrompts(body, await api(`prompts/${activity}`));
-          panel.dataset.loaded = "true";
-        } catch (error) {
-          body.textContent = error.message;
-        }
+  // A styled stand-in for the browser's confirm(). Resolves to true if the person picks
+  // the confirm button, and to false if they cancel, press Esc or click outside it.
+  // The safer choice (cancel) has the focus when it opens.
+  function confirmDialog({
+    title,
+    message,
+    confirmLabel = "OK",
+    cancelLabel = "Cancel",
+  }) {
+    return new Promise((resolve) => {
+      const dialog = el("dialog", "confirm");
+
+      const cancel = el("button", "btn", cancelLabel);
+      cancel.type = "button";
+      cancel.autofocus = true;
+      const confirm = el("button", "btn btn--primary", confirmLabel);
+      confirm.type = "button";
+      const actions = el("div", "confirm__actions");
+      actions.append(cancel, confirm);
+
+      const card = el("div", "confirm__card");
+      card.append(
+        el("h2", "confirm__title", title),
+        el("p", "confirm__message", message),
+        actions
+      );
+      dialog.append(card);
+
+      const answer = (result) => {
+        resolve(result);
+        closeDialog(dialog);
+      };
+      cancel.addEventListener("click", () => answer(false));
+      confirm.addEventListener("click", () => answer(true));
+      dialog.addEventListener("cancel", (event) => {
+        event.preventDefault();
+        answer(false);
       });
-    }
+      dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) answer(false);
+      });
+      dialog.addEventListener("close", () => dialog.remove()); // once it has faded out
+
+      document.body.append(dialog);
+      dialog.showModal();
+    });
   }
 
   // ---------- helpers ----------
@@ -186,7 +191,8 @@ const MM = (() => {
     requireIdentity,
     notice,
     clearNotice,
-    initInfoPanels,
+    closeDialog,
+    confirm: confirmDialog,
     timestamp,
     el,
   };

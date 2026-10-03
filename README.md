@@ -12,7 +12,7 @@ Everything runs on one computer. The language model runs locally through [Ollama
 | **02 Visual Poetry**  | Ask for words on a theme, drag them around a canvas, style them (colours can be described in plain language), then download the image or send it to the shared screen.                                                                                                                                                              |
 | **03 Temp Check**     | Everyone types one word to complete a sentence while the machine does the same 20 times. Play to match the machine, or to beat it, and watch what raising the temperature does. At high temperatures the machine sometimes produces garbled text; the app filters it out and the host screen says how many replies were thrown out. |
 
-Every page has a **Peek at the system prompt** panel that shows the real instructions and settings the machine is given.
+Every page has a **Peek at the system prompt** button that slides in a sheet showing the real instructions and settings the machine is given, with a plain-language note on what each part does.
 
 ---
 
@@ -134,6 +134,7 @@ Temp Check runs about twelve rounds, ending with a finale where everyone's Hot a
 | To change                                               | Edit                                                                                                               |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | The `?` instruction cards (all three activities)        | `public/data/instructions.json`                                                                                    |
+| The notes in the Peek at the system prompt sheet        | `public/data/peek.json`                                                                                            |
 | Wild cards for Activity 01                              | `public/data/wildcards.json` (each card is five words or phrases; the writer and the machine both have to use one) |
 | Temp Check sentences                                    | `public/data/stems.json` (use `___` for the blank)                                                                 |
 | Temp Check rounds, temperatures, timer and scoring mode | `public/data/rounds.json`                                                                                          |

@@ -5,7 +5,7 @@
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-text);
   outline-offset: 2px;
 }
 
@@ -16,12 +16,17 @@ html {
   font-size: var(--font-size-base);
   font-kerning: normal;
   line-height: normal;
+
+  /* ABC Areal's dark-mode axis: optical adjustments for light text on dark. */
+  @media (prefers-color-scheme: dark) {
+    font-variation-settings: "DRKM" 1;
+  }
 }
 
 body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 
   min-height: 100dvh;
   margin: 0;
@@ -48,15 +53,24 @@ main {
   width: 100%;
 }
 
-/* HEADER */
+/* HEADER
+   The site title, the activity links and the help button. Three columns: the two
+   outer ones are equal, so the links stay centred on the page whatever the widths of
+   the title and the buttons are. */
 .site-header {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: var(--space-sm) var(--space-lg);
 
   width: 100%;
+  padding-bottom: var(--space-md);
+  border-bottom: solid thin var(--color-border);
+
+  /* A little less space between the columns leaves the title room on small tablets. */
+  @media (max-width: 900px) {
+    column-gap: var(--space-md);
+  }
 
   & h1 {
     display: flex;
@@ -64,282 +78,92 @@ main {
     gap: 0.5em;
 
     margin: 0;
-    font-size: 1.5rem;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+
+    /* Below about this width the title and the links no longer fit side by side with
+       the links centred, so the event name moves under the title. */
+    @media (max-width: 900px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
   }
 }
 
 .site-header__event {
   color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 0.6em;
+  font-size: var(--text-sm);
   font-weight: 400;
+  letter-spacing: 0;
 }
 
 .site-header__actions {
   display: flex;
+  grid-column: 3;
+  justify-self: end;
   gap: var(--space-sm);
-}
-
-.save-btn,
-.send-btn,
-.restart-btn {
-  padding-block: 0.5em;
-  padding-inline: 1rem;
-  border-radius: var(--radius-sm);
-  background: var(--color-accent-soft);
-  border: solid thin var(--color-accent-border);
-
-  color: var(--color-accent);
-  font-size: 1.1em;
-
-  cursor: pointer;
-  transition: all var(--transition);
-
-  &:hover:not(:disabled) {
-    background: var(--color-invert-bg);
-    border-color: var(--color-invert-bg);
-    color: var(--color-invert-text);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: wait;
-  }
-}
-
-/* Starting over is a quieter, neutral button. */
-.restart-btn {
-  background: transparent;
-  border-color: var(--color-border-strong);
-  color: var(--color-text);
-}
-
-/* The main action: filled, so it stands out from Download. */
-.send-btn {
-  background: var(--color-invert-bg);
-  border-color: var(--color-invert-bg);
-  color: var(--color-invert-text);
-
-  &:hover:not(:disabled) {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
-  }
 }
 
 .site-nav {
   display: flex;
+  grid-column: 2;
   gap: var(--space-md);
 
-  & a {
-    padding: 0.5em;
-    border-radius: var(--radius-sm);
-    border: solid thin transparent;
-
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    font-weight: 400;
-    text-decoration: none;
-    white-space: nowrap;
-
-    transition: all var(--transition);
+  /* Small tablets are tight: the title needs the room to stay beside the centred links. */
+  @media (max-width: 900px) {
+    gap: var(--space-sm);
   }
+}
 
-  & a:hover {
+.site-nav__link {
+  padding: 0.5em 1em;
+  border: solid thin transparent;
+  border-radius: var(--radius-pill);
+
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  text-decoration: none;
+  white-space: nowrap;
+
+  transition: all var(--transition);
+
+  &:hover {
     background: var(--color-surface-hover);
     color: var(--color-text);
   }
 
-  & a.active {
-    border-color: var(--color-border-strong);
+  /* The page you are on: an accent outline with a low-opacity accent fill. */
+  &[aria-current="page"] {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
     color: var(--color-text);
     font-weight: 500;
   }
 }
 
-/* HELP BUTTON AND INSTRUCTIONS CARD */
-.help-btn {
-  width: 2.4rem;
-  height: 2.4rem;
-  border-radius: 50%;
-  border: solid thin var(--color-border-strong);
-  background: transparent;
-  color: var(--color-text);
+/* The "?" that opens the instructions card is a round .btn; this gives it the mono font
+   used for the other small labels. */
+.site-header__help {
   font-family: var(--font-mono);
-  font-size: 1.1em;
-  cursor: pointer;
-  transition: all var(--transition);
-
-  &:hover {
-    background: var(--color-invert-bg);
-    border-color: var(--color-invert-bg);
-    color: var(--color-invert-text);
-  }
-
-  &[hidden] {
-    display: none;
-  }
 }
 
-/* The card is a native <dialog>: the page behind it is inert and Esc closes it.
-   Padding sits on the inner form, so only clicks on the dimmed backdrop count
-   as clicks on the dialog itself. */
-.help {
-  width: 100%;
-  max-width: min(34rem, calc(100vw - 2rem));
-  padding: 0;
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--color-bg);
-  color: var(--color-text);
-
-  &::backdrop {
-    background: rgb(0 0 0 / 0.45);
-  }
-}
-
-.help__card {
+/* TOOLBAR
+   Under the header: the system prompt peek on the left, the page's own actions on
+   the right. */
+.toolbar {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: var(--space-md);
-  padding: var(--space-lg);
-
-  & p,
-  & h2 {
-    margin: 0;
-  }
 }
 
-.help__title {
-  font-size: 1.4rem;
-}
-
-.help__intro {
-  color: var(--color-text-soft);
-  font-size: 1.1rem;
-  line-height: 1.4;
-}
-
-.help__steps {
-  margin: 0;
-  padding-left: 1.5em;
-  list-style: decimal;
-  line-height: 1.5;
-
-  & li + li {
-    margin-top: 0.5em;
-  }
-}
-
-/* An optional closing tip. */
-.help__note {
-  padding: 0.6em 0.9em;
-  border-radius: var(--radius-sm);
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-}
-
-.help__close {
-  align-self: flex-end;
-  padding: 0.6em 1.4em;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: var(--color-invert-bg);
-  color: var(--color-invert-text);
-  cursor: pointer;
-}
-
-/* INFO PANELS (the system prompt peek) */
-.info {
+.toolbar__actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-shrink: 0;
   gap: var(--space-sm);
-
-  /* However many panels are open, they scroll rather than push the page off screen. */
-  max-height: 45dvh;
-  overflow-y: auto;
-}
-
-.info__panel {
-  border: solid thin var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-
-  /* Open panels take a full row. */
-  &[open] {
-    flex-basis: 100%;
-  }
-
-  & summary {
-    padding: 0.4em 0.9em;
-    cursor: pointer;
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    user-select: none;
-  }
-
-  &[open] summary {
-    color: var(--color-text);
-  }
-}
-
-.info__body {
-  padding: 0 var(--space-md) var(--space-md);
-  line-height: 1.5;
-  max-width: 70ch;
-
-  /* normalize.css removes list markers; put them back for readable steps. */
-  & ol,
-  & ul {
-    margin: 0;
-    padding-left: 1.5em;
-  }
-
-  & ol {
-    list-style: decimal;
-  }
-
-  & ul {
-    list-style: disc;
-  }
-
-  & li + li {
-    margin-top: 0.35em;
-  }
-
-  & h4 {
-    margin: var(--space-md) 0 0.25rem;
-    font-family: var(--font-mono);
-    font-size: 1em;
-    font-weight: 500;
-  }
-
-  & pre {
-    margin: 0;
-    padding: 0.75em;
-    border-radius: var(--radius-sm);
-    background: var(--color-bg);
-    border: solid thin var(--color-border);
-    font-family: var(--font-mono);
-    font-size: 0.9em;
-    white-space: pre-wrap;
-  }
-
-  & dl {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.15em 1em;
-    margin: 0.5em 0 0;
-    font-family: var(--font-mono);
-    font-size: 0.9em;
-
-    & dt {
-      color: var(--color-text-muted);
-    }
-
-    & dd {
-      margin: 0;
-    }
-  }
 }
 
 /* NOTICES (errors and short messages) */

@@ -7,26 +7,36 @@
     <link rel="stylesheet" href="css/normalize.css" />
     <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/buttons.css" />
+    <link rel="stylesheet" href="css/dialogs.css" />
+    <link rel="stylesheet" href="css/peek.css" />
     <link rel="stylesheet" href="css/activity-03.css" />
   </head>
   <body>
     <header class="site-header">
       <h1>Machine Madlibs <span class="site-header__event">field:work</span></h1>
       <nav class="site-nav">
-        <a href="activity_01.html">Activity 01</a>
-        <a href="activity_02.html">Activity 02</a>
-        <a href="activity_03.html" class="active">Activity 03</a>
+        <a href="activity_01.html" class="site-nav__link">Activity 01</a>
+        <a href="activity_02.html" class="site-nav__link">Activity 02</a>
+        <a href="activity_03.html" class="site-nav__link" aria-current="page"
+          >Activity 03</a
+        >
       </nav>
       <div class="site-header__actions">
-        <button type="button" class="help-btn" aria-label="How this works">?</button>
+        <button
+          type="button"
+          class="btn btn--icon site-header__help"
+          aria-label="How this works"
+        >
+          ?
+        </button>
       </div>
     </header>
 
-    <div class="info">
-      <details class="info__panel" data-peek="temp">
-        <summary>Peek at the system prompt</summary>
-        <div class="info__body"></div>
-      </details>
+    <div class="toolbar">
+      <button type="button" class="peek__trigger" data-peek="temp" aria-haspopup="dialog">
+        Peek at the system prompt
+      </button>
     </div>
 
     <p class="notice" role="status" hidden></p>
@@ -40,6 +50,7 @@
 
     <script src="js/common.js"></script>
     <script src="js/instructions.js"></script>
+    <script src="js/peek.js"></script>
     <script src="js/activity-03.js"></script>
   </body>
 </html>

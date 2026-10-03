@@ -24,27 +24,37 @@
 }
 
 :root {
-  /* Colour */
+  /* Follow the device's light or dark setting (native controls and scrollbars too). */
+  color-scheme: light dark;
+
+  /* Colour: light scheme. The dark values are further down. */
   --color-bg: #fff;
-  --color-surface: rgb(245, 245, 245);
-  --color-surface-hover: rgb(230, 230, 230);
+  --color-surface: #f5f5f5;
+  --color-surface-hover: #e8e8e8;
   --color-text: #000;
   --color-text-soft: #333;
-  --color-text-muted: grey;
-  --color-border: lightgray;
-  --color-border-strong: grey;
-  --color-accent: rgb(0, 120, 120);
-  --color-accent-soft: lightcyan;
-  --color-accent-border: darkcyan;
+  --color-text-muted: #6b6b6b;
+  --color-border: #dcdcdc;
+  --color-border-strong: #8c8c8c;
   --color-invert-bg: #000;
   --color-invert-text: #fff;
+
+  /* The field:work accent is a fill, not a text colour: it is too light to read on
+     white. Put --color-on-accent on top of it. Use --color-accent-text when the
+     accent has to be the colour of text or a thin line. */
+  --color-accent: #d5d12f;
+  --color-on-accent: #000;
+  --color-accent-soft: #f5f4cb;
+  --color-accent-border: #9b971f;
+  --color-accent-text: #6b6800;
+
   --color-selection: #ff3b5b; /* outline of the selected tile on the canvas */
   --color-hot: #e8452c; /* Temp Check: high temperature */
   --color-cold: #2f6fdd; /* Temp Check: low temperature */
   --color-error: #b3261e;
   --color-error-soft: #fdecea;
 
-  /* Host screen (projector): high contrast on dark */
+  /* Host screen (projector): high contrast on dark, whatever the device setting */
   --color-host-bg: #0d0d0f;
   --color-host-surface: #1c1c21;
   --color-host-text: #fff;
@@ -59,14 +69,45 @@
     "Helvetica Neue", Arial, sans-serif;
   --font-mono: "ABC Areal Mono", ui-monospace, monospace;
   --font-serif: Georgia, serif;
-  --font-size-base: 14px;
+  --font-size-base: 14px; /* 1rem everywhere */
 
-  /* Shape and spacing */
+  /* Type scale (in rem, so it follows --font-size-base) */
+  --text-sm: 0.85rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.6rem; /* the story */
+  --leading-prose: 1.55;
+
+  /* Shape and spacing.
+     Things you press are pills; things that hold content are rounded rectangles. */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-pill: 5rem;
+  --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
   --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
   --transition: 250ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1); /* quick start, soft landing */
+
+  @media (prefers-color-scheme: dark) {
+    --color-bg: #121212;
+    --color-surface: #1c1c1c;
+    --color-surface-hover: #2a2a2a;
+    --color-text: #f2f2f2;
+    --color-text-soft: #cfcfcf;
+    --color-text-muted: #9a9a9a;
+    --color-border: #333;
+    --color-border-strong: #6b6b6b;
+    --color-invert-bg: #f2f2f2;
+    --color-invert-text: #000;
+
+    --color-accent-soft: #313018;
+    --color-accent-border: #d5d12f;
+    --color-accent-text: #d5d12f;
+
+    --color-error: #ff9189;
+    --color-error-soft: #3b1714;
+  }
 }

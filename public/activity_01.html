@@ -7,35 +7,52 @@
     <link rel="stylesheet" href="css/normalize.css" />
     <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/buttons.css" />
+    <link rel="stylesheet" href="css/dialogs.css" />
+    <link rel="stylesheet" href="css/peek.css" />
     <link rel="stylesheet" href="css/activity-01.css" />
   </head>
   <body class="page--fit">
     <header class="site-header">
       <h1>Machine Madlibs <span class="site-header__event">field:work</span></h1>
       <nav class="site-nav">
-        <a href="activity_01.html" class="active">Activity 01</a>
-        <a href="activity_02.html">Activity 02</a>
-        <a href="activity_03.html">Activity 03</a>
+        <a href="activity_01.html" class="site-nav__link" aria-current="page"
+          >Activity 01</a
+        >
+        <a href="activity_02.html" class="site-nav__link">Activity 02</a>
+        <a href="activity_03.html" class="site-nav__link">Activity 03</a>
       </nav>
       <div class="site-header__actions">
-        <button type="button" class="help-btn" aria-label="How this works">?</button>
-        <button type="button" class="restart-btn">New story</button>
-        <button class="save-btn">↓ Download Text</button>
+        <button
+          type="button"
+          class="btn btn--icon site-header__help"
+          aria-label="How this works"
+        >
+          ?
+        </button>
       </div>
     </header>
 
-    <div class="info">
-      <details class="info__panel" data-peek="writer">
-        <summary>Peek at the system prompt</summary>
-        <div class="info__body"></div>
-      </details>
+    <div class="toolbar">
+      <button
+        type="button"
+        class="peek__trigger"
+        data-peek="writer"
+        aria-haspopup="dialog"
+      >
+        Peek at the system prompt
+      </button>
+      <div class="toolbar__actions">
+        <button type="button" class="btn toolbar__restart">+ New story</button>
+        <button type="button" class="btn toolbar__download">↓ Download text</button>
+      </div>
     </div>
 
     <p class="notice" role="status" hidden></p>
 
     <main>
       <section class="activity-01">
-        <div class="text-display">
+        <div class="story-scroller">
           <div class="story" aria-live="polite"></div>
         </div>
 
@@ -45,18 +62,43 @@
             <ul class="wildcard__words"></ul>
             <p class="wildcard__note">
               Use one of these in your next sentence. The machine will work in a different
-              one.
+              one. Tap a word to add it where your cursor is.
             </p>
           </div>
-          <button type="button" class="wildcard__dismiss" aria-label="Put the card back">
+          <button
+            type="button"
+            class="btn btn--close wildcard__dismiss"
+            aria-label="Put the card back"
+          >
             ×
           </button>
         </aside>
 
         <form class="prompt">
-          <button type="button" class="prompt__card">Wild card</button>
+          <button
+            type="button"
+            class="btn btn--icon btn--large prompt__card"
+            aria-label="Draw a wild card"
+            title="Draw a wild card"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
           <input type="text" maxlength="400" aria-label="Your next sentence" />
-          <button type="submit" class="prompt__send" aria-label="Send">↑</button>
+          <button
+            type="submit"
+            class="btn btn--icon btn--large btn--primary prompt__send"
+            aria-label="Send"
+          >
+            ↑
+          </button>
         </form>
         <p class="word-count"></p>
       </section>
@@ -64,6 +106,7 @@
 
     <script src="js/common.js"></script>
     <script src="js/instructions.js"></script>
+    <script src="js/peek.js"></script>
     <script src="js/activity-01.js"></script>
   </body>
 </html>
