@@ -1,4 +1,4 @@
-// The "peek at the system prompt" sheet: a panel that slides in from the right and shows
+// The "peek at the system prompt" sheet: a panel that slides in from the left and shows
 // what the machine is told for an activity, and how it is set up.
 // The prompts come from the server, so they can't drift from what is really used. The
 // explanations come from data/peek.json, so they can be edited without code.
@@ -11,7 +11,7 @@ const Peek = (() => {
 
   async function loadWords() {
     try {
-      const response = await fetch("data/peek.json");
+      const response = await fetch("/data/peek.json");
       return await response.json();
     } catch {
       return {}; // the sheet still works, just without the explanations
@@ -181,5 +181,13 @@ const Peek = (() => {
     return block;
   }
 
-  return { init };
+  function isOpen() {
+    return Boolean(dialog?.open);
+  }
+
+  function close() {
+    if (isOpen()) MM.closeDialog(dialog);
+  }
+
+  return { init, isOpen, close };
 })();

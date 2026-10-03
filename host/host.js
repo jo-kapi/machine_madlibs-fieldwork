@@ -3,8 +3,6 @@
 // the page picks up exactly where the game is.
 const stage = document.querySelector(".host__stage");
 const roundLabel = document.querySelector(".host__round");
-const notice = document.querySelector(".host__notice");
-const peek = document.querySelector(".host__peek");
 
 let view = null; // the latest state from the server
 let clockOffset = 0; // server time minus this computer's clock, in ms
@@ -21,17 +19,16 @@ const DIAL_SVG = `
     <defs>
       <linearGradient id="dial-gradient" x1="0" x2="1">
         <stop offset="0" style="stop-color: var(--color-cold)" />
-        <stop offset="0.5" style="stop-color: var(--color-host-text)" />
+        <stop offset="0.5" style="stop-color: var(--color-surface-hover)" />
         <stop offset="1" style="stop-color: var(--color-hot)" />
       </linearGradient>
     </defs>
     <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="url(#dial-gradient)"
       stroke-width="14" stroke-linecap="round" />
     <g class="dial__needle" style="transform: rotate(-90deg)">
-      <line x1="110" y1="110" x2="110" y2="34" stroke="white" stroke-width="5"
-        stroke-linecap="round" />
+      <line x1="110" y1="110" x2="110" y2="34" stroke-width="5" stroke-linecap="round" />
     </g>
-    <circle cx="110" cy="110" r="9" fill="white" />
+    <circle class="dial__hub" cx="110" cy="110" r="9" />
   </svg>`;
 
 // ---------- connection ----------
@@ -43,25 +40,33 @@ function init() {
     clockOffset = view.now - Date.now();
     render();
   };
-  source.onerror = () => showNotice("Lost the connection to the server. Reconnecting…");
-  source.onopen = () => notice.setAttribute("hidden", "");
+  source.onerror = () =>
+    MM.notice("Lost the connection to the server. Reconnecting…", "error");
+  source.onopen = () => MM.clearNotice();
 
   setInterval(tick, 100);
   document.addEventListener("keydown", handleKey);
 
+  Peek.init();
   Gallery.init(showGalleryCount);
-  for (const tab of document.querySelectorAll(".host__tab")) {
+  for (const tab of document.querySelectorAll(".site-nav__link")) {
     tab.addEventListener("click", () => {
       tab.blur();
       setView(tab.dataset.view);
     });
   }
-  document.querySelector(".host__buttons").addEventListener("click", (event) => {
+  document.querySelector(".host__buttons").addEventListener("click", async (event) => {
     const action = event.target.dataset.action;
     if (!action) return;
     event.target.blur();
-    if (action === "reset" && !confirm("Restart the game? Scores will be cleared."))
-      return;
+    if (action === "reset") {
+      const confirmed = await MM.confirm({
+        title: "Restart the game?",
+        message: "Scores will be cleared and the game goes back to the lobby.",
+        confirmLabel: "Restart",
+      });
+      if (!confirmed) return;
+    }
     send(action);
   });
 }
@@ -70,16 +75,8 @@ async function send(action, extra = {}) {
   try {
     await MM.api("host/command", { action, ...extra });
   } catch (error) {
-    showNotice(error.message);
+    MM.notice(error.message);
   }
-}
-
-let noticeTimer;
-function showNotice(message) {
-  notice.textContent = message;
-  notice.removeAttribute("hidden");
-  clearTimeout(noticeTimer);
-  noticeTimer = setTimeout(() => notice.setAttribute("hidden", ""), 4000);
 }
 
 // ---------- keyboard ----------
@@ -87,14 +84,16 @@ function showNotice(message) {
 // Switches between the game and the gallery of images sent to the screen.
 function setView(name) {
   currentView = name;
+  if (name !== "gallery") Gallery.close(); // a poem left open would cover the game
   stage.hidden = name !== "game";
   Gallery.element.hidden = name !== "gallery";
   roundLabel.hidden = name !== "game";
   document.querySelector(".host__hint--game").hidden = name !== "game";
   document.querySelector(".host__hint--gallery").hidden = name !== "gallery";
   document.querySelector(".host__buttons").hidden = name !== "game";
-  for (const tab of document.querySelectorAll(".host__tab")) {
-    tab.classList.toggle("host__tab--active", tab.dataset.view === name);
+  for (const tab of document.querySelectorAll(".site-nav__link")) {
+    if (tab.dataset.view === name) tab.setAttribute("aria-current", "page");
+    else tab.removeAttribute("aria-current");
   }
 }
 
@@ -107,6 +106,13 @@ function showGalleryCount(count) {
 function handleKey(event) {
   if (event.metaKey || event.ctrlKey || event.altKey) return;
   const step = event.shiftKey ? 0.5 : 0.1;
+
+  // A dialog (the system prompt sheet or a confirmation) has the keyboard while it is
+  // open. P also closes the sheet; Esc is handled by the dialog itself.
+  if (document.querySelector("dialog[open]:not(.dialog--closing)")) {
+    if ((event.key === "p" || event.key === "P") && Peek.isOpen()) Peek.close();
+    return;
+  }
 
   // Views can be switched from anywhere.
   if (event.key === "g" || event.key === "G") return setView("gallery");
@@ -136,10 +142,7 @@ function handleKey(event) {
       return send("redo");
     case "p":
     case "P":
-      return togglePeek();
-    case "Escape":
-      peek.setAttribute("hidden", "");
-      return undefined;
+      return document.querySelector(".peek__trigger").click();
     default:
       return undefined;
   }
@@ -148,38 +151,6 @@ function handleKey(event) {
 function toggleFullscreen() {
   if (document.fullscreenElement) document.exitFullscreen();
   else document.documentElement.requestFullscreen();
-}
-
-// Shows the real system prompt and sampling options, straight from the server.
-async function togglePeek() {
-  if (!peek.hasAttribute("hidden")) return peek.setAttribute("hidden", "");
-
-  const body = peek.querySelector(".host__peek-body");
-  body.replaceChildren(MM.el("p", "", "Loading…"));
-  peek.removeAttribute("hidden");
-  try {
-    const data = await MM.api("prompts/temp");
-    const { system, options } = data.prompts.sample;
-    const temperature = view?.round?.temperature ?? data.live?.temperature;
-
-    const settings = MM.el("dl");
-    const rows = {
-      model: data.model,
-      temperature: temperature ?? "set per round",
-      ...options,
-    };
-    for (const [name, value] of Object.entries(rows)) {
-      settings.append(MM.el("dt", "", name), MM.el("dd", "", String(value)));
-    }
-    body.replaceChildren(
-      MM.el("h2", "host__title", "System prompt"),
-      MM.el("pre", "", system),
-      settings
-    );
-  } catch (error) {
-    body.replaceChildren(MM.el("p", "", error.message));
-  }
-  return undefined;
 }
 
 // ---------- rendering ----------
@@ -258,7 +229,7 @@ function createDial() {
   element.innerHTML = DIAL_SVG;
   const needle = element.querySelector(".dial__needle");
   const value = MM.el("p", "dial__value");
-  element.append(value, MM.el("p", "dial__label", "Temperature"));
+  element.append(value, MM.el("p", "label", "Temperature"));
 
   let first = true;
   return {
@@ -279,24 +250,40 @@ function createDial() {
 // ---------- screens ----------
 
 function buildLobby() {
-  refs.url = MM.el("p", "lobby__url");
+  refs.urls = MM.el("div", "lobby__urls");
+  refs.count = MM.el("span", "host__badge");
   refs.names = MM.el("div", "lobby__names");
 
-  const lobby = MM.el("div", "lobby");
-  lobby.append(
-    MM.el("h1", "host__title", "Temp Check"),
-    MM.el("p", "host__sub", "Open this address on your device, then choose Activity 03:"),
-    refs.url,
-    refs.names
+  const lead = MM.el("p", "host__lead");
+  lead.append(
+    "Open this address on your device, then choose ",
+    MM.el("span", "mono", "Activity 03"),
+    "."
   );
+  const intro = MM.el("div", "lobby__intro");
+  intro.append(
+    MM.el("p", "label", "Join the game"),
+    MM.el("h2", "host__title", "Temp Check"),
+    lead
+  );
+
+  const room = MM.el("div", "lobby__room");
+  const roomLabel = MM.el("p", "label", "In the room");
+  roomLabel.append(refs.count);
+  room.append(roomLabel, refs.names);
+
+  const lobby = MM.el("div", "lobby");
+  lobby.append(intro, refs.urls, room);
   stage.append(lobby);
   showJoinInfo();
 }
 
 function fillNames() {
   const names = view.names.map((name) => MM.el("span", "chip", name));
-  if (names.length === 0) names.push(MM.el("span", "host__sub", "Nobody here yet"));
+  if (names.length === 0) names.push(MM.el("span", "lobby__empty", "Nobody here yet"));
   refs.names.replaceChildren(...names);
+  refs.count.textContent = view.names.length;
+  refs.count.hidden = view.names.length === 0;
 }
 
 async function showJoinInfo() {
@@ -305,9 +292,20 @@ async function showJoinInfo() {
   } catch {
     return;
   }
-  if (!refs.url) return; // the screen has changed meanwhile
-  refs.url.textContent =
-    joinInfo.urls.join("\n") || "No network found. Connect to Wi-Fi.";
+  if (!refs.urls) return; // the screen has changed meanwhile
+  const addresses = joinInfo.urls.map(urlElement);
+  if (addresses.length === 0) {
+    addresses.push(MM.el("p", "lobby__url", "No network found. Connect to Wi-Fi."));
+  }
+  refs.urls.replaceChildren(...addresses);
+}
+
+// An address with its "http://" faded, so the part to type stands out.
+function urlElement(url) {
+  const [, scheme = "", address] = url.match(/^(https?:\/\/)?(.*)$/);
+  const element = MM.el("p", "lobby__url");
+  element.append(MM.el("span", "lobby__scheme", scheme), address);
+  return element;
 }
 
 function buildIntro() {
@@ -347,11 +345,9 @@ function buildInput() {
 }
 
 function buildThinking() {
-  stage.append(
-    modeLabel(view.round),
-    stemElement(view.round.stem),
-    MM.el("h2", "host__title thinking", "The machine is thinking…")
-  );
+  const title = MM.el("h2", "host__title thinking", "The machine is thinking");
+  title.append(MM.dots());
+  stage.append(modeLabel(view.round), stemElement(view.round.stem), title);
 }
 
 function buildReveal() {
@@ -406,7 +402,7 @@ function buildReveal() {
   const onlyPeople = results.players.filter((entry) => entry.machineCount === 0);
   if (onlyPeople.length > 0) {
     const only = MM.el("div", "chart__only");
-    only.append(MM.el("span", "chart__only-label", "Only people said:"));
+    only.append(MM.el("span", "label", "Only people said"));
     onlyPeople.forEach((entry, index) => {
       const label = entry.count > 1 ? `${entry.word} ×${entry.count}` : entry.word;
       const status = entry.status ? ` tag--${entry.status}` : "";
@@ -422,7 +418,7 @@ function buildReveal() {
   }
 
   const points = MM.el("div", "points");
-  points.append(MM.el("p", "points__title", "Points this round"));
+  points.append(MM.el("p", "label", "Points this round"));
   if (results.points.length === 0)
     points.append(MM.el("p", "host__sub", "Nobody scored."));
   results.points.forEach((entry, index) => {
@@ -465,7 +461,8 @@ function buildStandings() {
   }
 
   stage.append(
-    MM.el("h1", "host__title", ended ? "Final standings" : "Leaderboard"),
+    MM.el("p", "label", ended ? "Game over" : "Standings so far"),
+    MM.el("h2", "host__title", ended ? "Final standings" : "Leaderboard"),
     list
   );
   setTimeout(() => {

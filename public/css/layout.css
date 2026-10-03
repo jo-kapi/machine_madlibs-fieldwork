@@ -45,6 +45,11 @@ body {
   }
 }
 
+/* Names of things in the app, such as "Activity 03", are set in the mono face. */
+.mono {
+  font-family: var(--font-mono);
+}
+
 main {
   display: flex;
   flex-direction: column;
@@ -129,11 +134,13 @@ main {
   padding-inline: 1em;
   border: solid thin transparent;
   border-radius: var(--radius-pill);
+  background: transparent; /* for links that are <button>s, as on the host screen */
 
   color: var(--color-text-muted);
   font-family: var(--font-mono);
   text-decoration: none;
   white-space: nowrap;
+  cursor: pointer;
 
   transition: all var(--transition);
 

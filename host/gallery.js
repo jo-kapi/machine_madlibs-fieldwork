@@ -29,7 +29,8 @@ const Gallery = (() => {
       const item = items.find((entry) => entry.id === openId);
       if (item) remove(item);
     });
-    // Clicking the dark area around the picture closes it.
+    lightbox.querySelector(".lightbox__close").addEventListener("click", close);
+    // Clicking the empty area around the picture closes it too.
     lightbox.addEventListener("click", (event) => {
       if (event.target === lightbox) close();
     });
@@ -66,7 +67,12 @@ const Gallery = (() => {
   }
 
   async function remove(item) {
-    if (!confirm(`Delete the poem by ${item.name} from the gallery?`)) return;
+    const confirmed = await MM.confirm({
+      title: "Delete this poem?",
+      message: `The poem by ${item.name} will be removed from the gallery.`,
+      confirmLabel: "Delete",
+    });
+    if (!confirmed) return;
     try {
       await MM.api(`host/gallery/${item.id}`, undefined, "DELETE");
     } catch {
@@ -133,5 +139,5 @@ const Gallery = (() => {
     }
   }
 
-  return { init, handleKey, element: view };
+  return { init, handleKey, close, element: view };
 })();

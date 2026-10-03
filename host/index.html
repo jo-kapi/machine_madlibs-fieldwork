@@ -6,64 +6,85 @@
     <title>Machine Madlibs – field:work | Host</title>
     <link rel="stylesheet" href="/css/normalize.css" />
     <link rel="stylesheet" href="/css/tokens.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/buttons.css" />
+    <link rel="stylesheet" href="/css/forms.css" />
+    <link rel="stylesheet" href="/css/dialogs.css" />
+    <link rel="stylesheet" href="/css/peek.css" />
     <link rel="stylesheet" href="host.css" />
   </head>
   <body class="host">
-    <header class="host__bar">
-      <span class="host__brand">Machine Madlibs <small>field:work</small></span>
-      <nav class="host__tabs">
-        <button type="button" data-view="game" class="host__tab host__tab--active">
-          Temp Check
-        </button>
-        <button type="button" data-view="gallery" class="host__tab">
+    <header class="site-header">
+      <h1>Machine Madlibs <span class="site-header__event">field:work</span></h1>
+      <nav class="site-nav">
+        <button type="button" data-view="gallery" class="site-nav__link">
           Gallery <span class="host__badge" hidden></span>
         </button>
+        <button type="button" data-view="game" class="site-nav__link" aria-current="page">
+          Temp Check
+        </button>
       </nav>
-      <span class="host__round"></span>
+      <div class="site-header__actions">
+        <span class="host__round"></span>
+      </div>
     </header>
 
     <main class="host__stage"></main>
 
     <main class="host__gallery" hidden>
-      <p class="host__sub gallery__empty">
-        Nothing here yet. Poems sent from Activity 02 appear here.
-      </p>
+      <div class="gallery__empty">
+        <p class="label">Gallery</p>
+        <h2 class="host__title">Nothing here yet</h2>
+        <p class="host__lead">
+          Poems sent from <span class="mono">Activity 02</span> appear here.
+        </p>
+      </div>
       <div class="gallery__grid"></div>
     </main>
 
     <div class="lightbox" hidden>
+      <div class="lightbox__actions">
+        <button type="button" class="btn lightbox__delete">Delete</button>
+        <button type="button" class="btn btn--close lightbox__close" aria-label="Close">
+          ×
+        </button>
+      </div>
       <img class="lightbox__image" alt="" />
       <p class="lightbox__caption"></p>
-      <p class="lightbox__hint">
+      <p class="host__hint">
         <kbd>←</kbd><kbd>→</kbd> browse · <kbd>Esc</kbd> close · <kbd>Delete</kbd> remove
         · <kbd>F</kbd> fullscreen
       </p>
-      <button type="button" class="lightbox__delete">Delete</button>
     </div>
 
-    <aside class="host__peek" hidden>
-      <div class="host__peek-body"></div>
-    </aside>
+    <p class="notice notice--toast" role="status" hidden></p>
 
-    <p class="host__notice" role="status" hidden></p>
-
-    <footer class="host__controls">
-      <span class="host__hint host__hint--game">
+    <footer class="host__footer">
+      <p class="host__hint host__hint--game">
         <kbd>Space</kbd> next · <kbd>↑</kbd><kbd>↓</kbd> temperature · <kbd>R</kbd> redo ·
         <kbd>P</kbd> system prompt · <kbd>G</kbd> gallery · <kbd>F</kbd> fullscreen
-      </span>
-      <span class="host__hint host__hint--gallery" hidden>
+      </p>
+      <p class="host__hint host__hint--gallery" hidden>
         <kbd>Enter</kbd> open · <kbd>←</kbd><kbd>→</kbd> browse · <kbd>Delete</kbd> remove
         · <kbd>T</kbd> game · <kbd>F</kbd> fullscreen
-      </span>
-      <span class="host__buttons">
-        <button type="button" data-action="next">Next</button>
-        <button type="button" data-action="redo">Redo round</button>
-        <button type="button" data-action="reset">Restart game</button>
-      </span>
+      </p>
+      <div class="host__buttons">
+        <button
+          type="button"
+          class="peek__trigger"
+          data-peek="temp"
+          aria-haspopup="dialog"
+        >
+          Peek at the system prompt
+        </button>
+        <button type="button" class="btn" data-action="redo">Redo round</button>
+        <button type="button" class="btn" data-action="reset">Restart game</button>
+        <button type="button" class="btn btn--primary" data-action="next">Next</button>
+      </div>
     </footer>
 
     <script src="/js/common.js"></script>
+    <script src="/js/peek.js"></script>
     <script src="gallery.js"></script>
     <script src="host.js"></script>
   </body>

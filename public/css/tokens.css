@@ -59,15 +59,6 @@
   --color-error: #b3261e;
   --color-error-soft: #fdecea;
 
-  /* Host screen (projector): high contrast on dark, whatever the device setting */
-  --color-host-bg: #0d0d0f;
-  --color-host-surface: #1c1c21;
-  --color-host-text: #fff;
-  --color-host-muted: #9a9aa2;
-  --color-host-accent: #7ee0d0;
-  --color-good: #48d17a;
-  --color-warn: #f2b134;
-
   /* Type */
   --font-ui:
     "ABC Areal", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
