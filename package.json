@@ -11,9 +11,7 @@
   },
   "scripts": {
     "start": "node server/index.js",
-    "dev": "node --watch server/index.js",
-    "check": "node scripts/check.mjs",
-    "loadtest": "node scripts/loadtest.mjs"
+    "dev": "node --watch server/index.js"
   },
   "dependencies": {
     "express": "^5.2.1"

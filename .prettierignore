@@ -3,5 +3,4 @@ package-lock.json
 public/js/p5.min.js
 public/css/normalize.css
 public/css/fonts
-scripts/out
 LICENSE

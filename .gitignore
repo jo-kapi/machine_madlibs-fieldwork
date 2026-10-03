@@ -149,10 +149,6 @@ CLAUDE.local.md
 .gemini/
 GEMINI.md
 
-# Maintainer's model taste test: personal testing, not part of the workshop kit
-scripts/bakeoff.mjs
-scripts/out/
-
 # Scratch space
 scratch/
 tmp/

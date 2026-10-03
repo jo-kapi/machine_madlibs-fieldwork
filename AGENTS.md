@@ -11,13 +11,11 @@ users are artists and designers rather than developers, so **readable beats clev
 
 ## Commands
 
-| Command            | Does                                                                       |
-| ------------------ | -------------------------------------------------------------------------- |
-| `npm install`      | Install the one dependency (Express)                                       |
-| `npm start`        | Run the app on port 3000 (`http://localhost:3000`, host screen at `/host`) |
-| `npm run dev`      | Same, restarting when server code changes                                  |
-| `npm run check`    | Pre-flight: Ollama, model, data files, network address                     |
-| `npm run loadtest` | Simulate a full room against a running server                              |
+| Command       | Does                                                                       |
+| ------------- | -------------------------------------------------------------------------- |
+| `npm install` | Install the one dependency (Express)                                       |
+| `npm start`   | Run the app on port 3000 (`http://localhost:3000`, host screen at `/host`) |
+| `npm run dev` | Same, restarting when server code changes                                  |
 
 Needs Node 20.12 or newer and a running Ollama with the models named by `MODEL`
 (Activities 1 and 2) and `TEMP_MODEL` (Activity 3); see `.env.example`. Settings come from environment variables or a `.env` file.
@@ -36,7 +34,6 @@ public/            What participants load (plain HTML, CSS and browser JavaScrip
   css/tokens.css     Every colour, font and size. Re-theme here.
   data/              Wild cards, Temp Check stems and rounds: content, not code
 host/              The projector screen and gallery; served only to the host machine
-scripts/           check.mjs and loadtest.mjs
 ```
 
 ## Conventions
@@ -107,11 +104,11 @@ These are the privacy and safety promises the README makes to participants.
 
 ## Testing
 
-There is no committed test suite. To check a change, run `npm start` and try the pages in
-a browser, including the host screen at `/host` and Activity 03 in a second window. Run
-`npm run check` for the environment, and `npm run loadtest` if you touched anything that
-talks to the model or the game. Logic that is easy to get subtly wrong (scoring, game
-phases, request validation) is worth testing with Node's built-in `node:test` runner.
+There is no committed test suite. To check a change, run `npm start`, which reports whether
+Ollama and the models are ready, and try the pages in a browser, including the host screen
+at `/host` and Activity 03 in a second window. Logic that is easy to get subtly wrong
+(scoring, game phases, request validation) is worth testing with Node's built-in `node:test`
+runner.
 
 ## Working with git
 

@@ -1,5 +1,5 @@
 // Thin client for Ollama's native /api/chat endpoint.
-// `chat` goes through the shared limiter; `rawChat` skips it (used by scripts).
+// `chat` goes through the shared limiter; `rawChat` skips it (used for the startup warm-up).
 import { config } from "./config.js";
 import { createLimiter, QueueFullError } from "./limiter.js";
 
