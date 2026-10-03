@@ -1,5 +1,6 @@
 // Wild cards live in public/data/wildcards.json so they can be edited without
-// touching code. The file is read on every use, so edits apply immediately.
+// touching code. Each card has an id and five words or phrases. The file is read
+// on every use, so edits apply immediately.
 import fs from "node:fs/promises";
 import path from "node:path";
 import { publicDir } from "./paths.js";

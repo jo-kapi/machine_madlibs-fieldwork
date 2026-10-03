@@ -97,15 +97,6 @@ const MM = (() => {
 
   // ---------- info panels ----------
 
-  function remember(key, value) {
-    try {
-      if (value === undefined) return localStorage.getItem(key);
-      localStorage.setItem(key, value);
-    } catch {
-      return null;
-    }
-  }
-
   // Draws one activity's system prompts and sampling options into `body`.
   function renderPrompts(body, data) {
     body.replaceChildren();
@@ -136,6 +127,12 @@ const MM = (() => {
         body.append(twist);
       }
 
+      if (prompt.lengths) {
+        const lengths = document.createElement("pre");
+        lengths.textContent = `Each turn, one of these is added at random:\n${prompt.lengths.join("\n")}`;
+        body.append(lengths);
+      }
+
       const options = document.createElement("dl");
       for (const [name, value] of Object.entries(prompt.options)) {
         const term = document.createElement("dt");
@@ -148,17 +145,11 @@ const MM = (() => {
     }
   }
 
-  // Wires up the <details class="info__panel"> elements on a page:
-  //  - data-remember="key": reopen or stay closed, as the person left it.
-  //  - data-peek="activity": load the live system prompt when first opened.
+  // Wires up the "peek at the system prompt" panels (<details class="info__panel">):
+  // each loads the live system prompt for its data-peek="activity" when first opened.
   function initInfoPanels() {
     for (const panel of document.querySelectorAll(".info__panel")) {
-      const key = panel.dataset.remember;
-      if (key && remember(`mm-panel-${key}`) === "closed") panel.open = false;
-
       panel.addEventListener("toggle", async () => {
-        if (key) remember(`mm-panel-${key}`, panel.open ? "open" : "closed");
-
         const activity = panel.dataset.peek;
         if (!activity || !panel.open || panel.dataset.loaded) return;
         const body = panel.querySelector(".info__body");

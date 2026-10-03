@@ -81,7 +81,8 @@ main {
 }
 
 .save-btn,
-.send-btn {
+.send-btn,
+.restart-btn {
   padding-block: 0.5em;
   padding-inline: 1rem;
   border-radius: var(--radius-sm);
@@ -104,6 +105,13 @@ main {
     opacity: 0.5;
     cursor: wait;
   }
+}
+
+/* Starting over is a quieter, neutral button. */
+.restart-btn {
+  background: transparent;
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
 }
 
 /* The main action: filled, so it stands out from Download. */
@@ -148,7 +156,99 @@ main {
   }
 }
 
-/* INFO PANELS (instructions and system prompt peek) */
+/* HELP BUTTON AND INSTRUCTIONS CARD */
+.help-btn {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  border: solid thin var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: all var(--transition);
+
+  &:hover {
+    background: var(--color-invert-bg);
+    border-color: var(--color-invert-bg);
+    color: var(--color-invert-text);
+  }
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+/* The card is a native <dialog>: the page behind it is inert and Esc closes it.
+   Padding sits on the inner form, so only clicks on the dimmed backdrop count
+   as clicks on the dialog itself. */
+.help {
+  width: 100%;
+  max-width: min(34rem, calc(100vw - 2rem));
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+
+  &::backdrop {
+    background: rgb(0 0 0 / 0.45);
+  }
+}
+
+.help__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+
+  & p,
+  & h2 {
+    margin: 0;
+  }
+}
+
+.help__title {
+  font-size: 1.4rem;
+}
+
+.help__intro {
+  color: var(--color-text-soft);
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.help__steps {
+  margin: 0;
+  padding-left: 1.5em;
+  list-style: decimal;
+  line-height: 1.5;
+
+  & li + li {
+    margin-top: 0.5em;
+  }
+}
+
+/* An optional closing tip. */
+.help__note {
+  padding: 0.6em 0.9em;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.help__close {
+  align-self: flex-end;
+  padding: 0.6em 1.4em;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-invert-bg);
+  color: var(--color-invert-text);
+  cursor: pointer;
+}
+
+/* INFO PANELS (the system prompt peek) */
 .info {
   display: flex;
   flex-wrap: wrap;

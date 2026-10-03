@@ -32,7 +32,7 @@ server/            Node server (ES modules). Start reading at index.js, then app
   game-routes.js     Temp Check and host routes (host routes are localhost-only)
 public/            What participants load (plain HTML, CSS and browser JavaScript)
   css/tokens.css     Every colour, font and size. Re-theme here.
-  data/              Wild cards, Temp Check stems and rounds: content, not code
+  data/              Wild cards, instruction cards, Temp Check stems and rounds: content, not code
 host/              The projector screen and gallery; served only to the host machine
 ```
 
@@ -77,7 +77,8 @@ These are the privacy and safety promises the README makes to participants.
 
 - **Change what the machine is told:** edit `server/prompts.js`. The "peek at the system
   prompt" panels read from the same object, so they stay accurate.
-- **Edit wild cards, stems or Temp Check rounds:** edit the JSON files in `public/data/`.
+- **Edit wild cards, instruction cards, stems or Temp Check rounds:** edit the JSON files in
+  `public/data/`.
   They are read when used, so no restart is needed.
 - **Change the look:** edit `public/css/tokens.css`.
 - **Add an activity:** add a page in `public/`, add its prompts to `prompts.js`, add a

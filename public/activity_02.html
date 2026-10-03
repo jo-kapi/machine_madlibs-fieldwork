@@ -18,30 +18,13 @@
         <a href="activity_03.html">Activity 03</a>
       </nav>
       <div class="site-header__actions">
+        <button type="button" class="help-btn" aria-label="How this works">?</button>
         <button class="save-btn">↓ Download Image</button>
         <button class="send-btn">Send to screen</button>
       </div>
     </header>
 
     <div class="info">
-      <details class="info__panel" data-remember="activity-02" open>
-        <summary>How this works</summary>
-        <div class="info__body">
-          <ol>
-            <li>
-              Type a theme and press Generate Words. Leave it blank for filler words like
-              "the" and "of".
-            </li>
-            <li>Click a word to put it on the canvas. Click it again to take it off.</li>
-            <li>Drag words around. Select one on the canvas to restyle it.</li>
-            <li>
-              Colours can be hex codes (#ff3b5b) or a description ("burnt orange"). The
-              machine turns descriptions into colours.
-            </li>
-            <li>Download your image when you're done.</li>
-          </ol>
-        </div>
-      </details>
       <details class="info__panel" data-peek="poet">
         <summary>Peek at the system prompt: words</summary>
         <div class="info__body"></div>
@@ -121,6 +104,7 @@
 
     <script src="js/p5.min.js"></script>
     <script src="js/common.js"></script>
+    <script src="js/instructions.js"></script>
     <script src="js/activity-02.js"></script>
     <script src="js/sketch.js"></script>
   </body>

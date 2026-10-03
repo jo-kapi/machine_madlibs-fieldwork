@@ -8,7 +8,7 @@ Everything runs on one computer. The language model runs locally through [Ollama
 
 | Activity              | What you do                                                                                                                                                                                                                                                                                                                         |
 | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **01 Micro-fictions** | Take turns with the machine writing a story, one sentence each. Draw wild cards for twists. The story runs to 350 words, then you can download it.                                                                                                                                                                                  |
+| **01 Micro-fictions** | Take turns with the machine writing a story, one sentence each. Draw a wild card of five words and phrases to work in, and start over any time. The story runs to 250 words, then you can download it.                                                                                                                              |
 | **02 Visual Poetry**  | Ask for words on a theme, drag them around a canvas, style them (colours can be described in plain language), then download the image or send it to the shared screen.                                                                                                                                                              |
 | **03 Temp Check**     | Everyone types one word to complete a sentence while the machine does the same 20 times. Play to match the machine, or to beat it, and watch what raising the temperature does. At high temperatures the machine sometimes produces garbled text; the app filters it out and the host screen says how many replies were thrown out. |
 
@@ -131,13 +131,14 @@ Temp Check runs about twelve rounds, ending with a finale where everyone's Hot a
 
 ### Changing the content
 
-| To change                                               | Edit                                                                                                  |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Wild cards for Activity 01                              | `public/data/wildcards.json` (`human` is shown to the writer, `ai` is the twist given to the machine) |
-| Temp Check sentences                                    | `public/data/stems.json` (use `___` for the blank)                                                    |
-| Temp Check rounds, temperatures, timer and scoring mode | `public/data/rounds.json`                                                                             |
-| What the machine is told                                | `server/prompts.js`                                                                                   |
-| Colours and fonts                                       | `public/css/tokens.css` (the font files are in `public/css/fonts/`)                                   |
+| To change                                               | Edit                                                                                                               |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| The `?` instruction cards (all three activities)        | `public/data/instructions.json`                                                                                    |
+| Wild cards for Activity 01                              | `public/data/wildcards.json` (each card is five words or phrases; the writer and the machine both have to use one) |
+| Temp Check sentences                                    | `public/data/stems.json` (use `___` for the blank)                                                                 |
+| Temp Check rounds, temperatures, timer and scoring mode | `public/data/rounds.json`                                                                                          |
+| What the machine is told                                | `server/prompts.js`                                                                                                |
+| Colours and fonts                                       | `public/css/tokens.css` (the font files are in `public/css/fonts/`)                                                |
 
 The data files are read each time a game starts or a card is drawn, so you don't need to restart the server. Restart the game from the host page to pick up changes to the rounds or stems.
 
@@ -205,5 +206,5 @@ Issues and pull requests are welcome. [`AGENTS.md`](AGENTS.md) describes how the
 ## Credits
 
 - Created by [Kapilan Naidu](https://github.com/kapilan-naidu).
-- Made for **field:work (Lab #2)**, a jo+kapi event.
+- Made for **Poetry in Computation (Exploration Lab #2)**, organized by _jo+kapi_ as part of **_field:work_**.
 - Built with [Ollama](https://ollama.com), [Express](https://expressjs.com), and [p5.js](https://p5js.org).

@@ -23,6 +23,10 @@ function shortText(value, label) {
 export function tidySentence(text) {
   let clean = text
     .replace(/\s+/g, " ")
+    // Models sometimes add markdown emphasis (**word**, _word_), which would show
+    // up as stray symbols in the story.
+    .replace(/\*+/g, "")
+    .replace(/(^|\s)_+([^_]+?)_+(?=[\s.,;:!?]|$)/g, "$1$2")
     .replace(/^(AI|You):\s*/i, "")
     .trim();
   clean = clean.replace(/^["“](.*)["”]$/, "$1");
@@ -67,13 +71,29 @@ export function parseHex(text) {
   return `#${digits}`;
 }
 
+// Picks one of the length instructions at random and adds it to the system prompt.
+export function withLength(system, lengths, random = Math.random) {
+  return `${system} ${lengths[Math.floor(random() * lengths.length)]}`;
+}
+
+// Lowercases and straightens curly apostrophes, so "witch’s" matches "witch's".
+const plain = (text) => text.toLowerCase().replace(/[\u2018\u2019]/g, "'");
+
+// The words on a wild card that the machine may choose from: the ones the writer
+// did not use in their own sentence, so the two of them don't pick the same one.
+export function cardChoices(words, humanSentence) {
+  const sentence = plain(String(humanSentence ?? ""));
+  return words.filter((word) => !sentence.includes(plain(word)));
+}
+
 // `story` is the sentences so far, alternating between the AI and the human.
-// `cardId` names a wild card whose twist applies to the AI's next sentence.
+// `cardId` names a wild card. The machine works one of its words into its next
+// sentence, a different one from the writer's, and doesn't mention the card.
 export async function writer({ mode, story = [], cardId, signal }) {
   if (mode === "start") {
-    const { system, options } = PROMPTS.writer.start;
+    const { system, lengths, options } = PROMPTS.writer.start;
     const { text } = await chat({
-      system,
+      system: withLength(system, lengths),
       user: "Begin a new story.",
       options,
       signal,
@@ -96,15 +116,25 @@ export async function writer({ mode, story = [], cardId, signal }) {
     throw new InputError("The story is empty or too long.");
   }
 
-  const { system, options, twist } = PROMPTS.writer.continue;
+  const { system, lengths, options, twist } = PROMPTS.writer.continue;
   let user = joined;
   if (cardId !== undefined && cardId !== null) {
     const card = await findCard(cardId);
     if (!card) throw new InputError("Unknown wild card.");
-    if (card.ai) user += `\n\n${twist.replace("{twist}", card.ai)}`;
+    if (Array.isArray(card.words)) {
+      // The last sentence is the writer's, so the machine picks a different word.
+      const choices = cardChoices(card.words, story.at(-1));
+      if (choices.length > 0)
+        user += `\n\n${twist.replace("{words}", choices.join(", "))}`;
+    }
   }
 
-  const { text } = await chat({ system, user, options, signal });
+  const { text } = await chat({
+    system: withLength(system, lengths),
+    user,
+    options,
+    signal,
+  });
   return { text: tidySentence(text) };
 }
 

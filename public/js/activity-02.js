@@ -13,6 +13,7 @@ function init() {
   // First-time visitors are sent to the join page.
   if (!MM.requireIdentity()) return;
   MM.initInfoPanels();
+  Instructions.init("activity-02");
 
   // Cache DOM elements
   saveButton = document.querySelector(".save-btn");

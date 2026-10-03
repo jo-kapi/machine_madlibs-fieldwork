@@ -1,38 +1,282 @@
 [
   {
-    "id": "twist",
-    "title": "Plot twist",
-    "human": "Make something unexpected happen.",
-    "ai": "Make something unexpected happen."
+    "id": 1,
+    "words": [
+      "off-world colony",
+      "ghostly",
+      "bone orchard",
+      "shared secret",
+      "misprinted prophecy"
+    ]
   },
   {
-    "id": "senses",
-    "title": "Sensory detail",
-    "human": "Include a smell or a sound.",
-    "ai": "Describe something the character smells or hears."
+    "id": 2,
+    "words": [
+      "nanite swarm",
+      "spooky library",
+      "red water",
+      "just-missed train",
+      "mildly cursed mug"
+    ]
   },
   {
-    "id": "newcomer",
-    "title": "New arrival",
-    "human": "Bring a new character into the story.",
-    "ai": "Introduce a new character."
+    "id": 3,
+    "words": [
+      "interplanetary tax",
+      "time loop",
+      "teeth in the sink",
+      "rain-soaked",
+      "confession"
+    ]
   },
   {
-    "id": "weather",
-    "title": "Change the weather",
-    "human": "Let the weather change, suddenly.",
-    "ai": "Make the weather change suddenly."
+    "id": 4,
+    "words": [
+      "synthetic memory",
+      "goblin HR rep",
+      "haunted spreadsheet",
+      "librarian’s touch",
+      "group chat disaster"
+    ]
   },
   {
-    "id": "secret",
-    "title": "A secret",
-    "human": "Reveal something a character has been hiding.",
-    "ai": "Reveal something a character has been hiding."
+    "id": 5,
+    "words": [
+      "gravity leak",
+      "moonlit rite",
+      "mouth in the wall",
+      "eyes across the room",
+      "emotional chicken"
+    ]
   },
   {
-    "id": "tiny",
-    "title": "Zoom in",
-    "human": "Describe one very small detail.",
-    "ai": "Describe one very small, specific detail."
+    "id": 6,
+    "words": [
+      "circuit prophet",
+      "mermaid accounting",
+      "vintage blood jar",
+      "quiet coffee date",
+      "forgotten side quest"
+    ]
+  },
+  {
+    "id": 7,
+    "words": [
+      "deep space echo",
+      "scroll of spam",
+      "mirror double",
+      "unread letter",
+      "clumsy teleportation"
+    ]
+  },
+  {
+    "id": 8,
+    "words": [
+      "recursive reality",
+      "arcane debt",
+      "locked basement",
+      "slow dance",
+      "Wi-Fi ghost"
+    ]
+  },
+  {
+    "id": 9,
+    "words": [
+      "time fracture",
+      "wizard debt collector",
+      "ceiling eyes",
+      "rehearsed goodbye",
+      "laundry gremlin"
+    ]
+  },
+  {
+    "id": 10,
+    "words": [
+      "bio-drift",
+      "cursed heirloom",
+      "televised seance",
+      "missed connection",
+      "awkward brunch"
+    ]
+  },
+  {
+    "id": 11,
+    "words": [
+      "rogue satellite",
+      "cloud-summoning",
+      "church choir",
+      "overheard playlist",
+      "cow costume"
+    ]
+  },
+  {
+    "id": 12,
+    "words": [
+      "moonbase karaoke",
+      "enchanted marrow",
+      "radio static",
+      "tangled headphones",
+      "haunted burrito"
+    ]
+  },
+  {
+    "id": 13,
+    "words": [
+      "holographic orchard",
+      "runestone pact",
+      "no-code hallway",
+      "accidental poem",
+      "sentient toaster"
+    ]
+  },
+  {
+    "id": 14,
+    "words": [
+      "terraforming mishap",
+      "talking sword",
+      "witching hour",
+      "fleeting summer",
+      "reality TV logic"
+    ]
+  },
+  {
+    "id": 15,
+    "words": [
+      "plasma bloom",
+      "dragonfly castle",
+      "empty cradle",
+      "shared umbrella",
+      "karaoke night"
+    ]
+  },
+  {
+    "id": 16,
+    "words": [
+      "blackhole brunch",
+      "enchanted tape",
+      "whispering wallpaper",
+      "unexpected serenade",
+      "confused traveler"
+    ]
+  },
+  {
+    "id": 17,
+    "words": [
+      "quantum fog",
+      "wand malfunction",
+      "sobbing in the attic",
+      "midnight rendezvous",
+      "awkward sword fight"
+    ]
+  },
+  {
+    "id": 18,
+    "words": [
+      "hyperdrive",
+      "phoenix soup",
+      "smile that won’t fade",
+      "burnt toast flirtation",
+      "supportive worm"
+    ]
+  },
+  {
+    "id": 19,
+    "words": [
+      "zero-g romance",
+      "dreamwalker",
+      "rotting grin",
+      "secondhand sweat",
+      "magical intern"
+    ]
+  },
+  {
+    "id": 20,
+    "words": [
+      "time capsule anomaly",
+      "forgotten spell",
+      "expired prayer",
+      "laundry meet-cute",
+      "weird roommate"
+    ]
+  },
+  {
+    "id": 21,
+    "words": [
+      "neural uplink",
+      "invisible innkeeper",
+      "lullaby valley",
+      "first spark",
+      "potion mix-up"
+    ]
+  },
+  {
+    "id": 22,
+    "words": [
+      "AI rebellion",
+      "dwarven coffee ritual",
+      "attic shopping",
+      "late-night memo",
+      "gelatinous romp"
+    ]
+  },
+  {
+    "id": 23,
+    "words": [
+      "robot constitution",
+      "bureaucracy",
+      "misguided child",
+      "post-it note love",
+      "left on read"
+    ]
+  },
+  {
+    "id": 24,
+    "words": [
+      "data ghost",
+      "eldritch whisper",
+      "sleep paralysis demon",
+      "window seat",
+      "sentient blender"
+    ]
+  },
+  {
+    "id": 25,
+    "words": [
+      "time fracture",
+      "wizard debt collector",
+      "holographic orchard",
+      "runestone pact",
+      "no-code hallway"
+    ]
+  },
+  {
+    "id": 26,
+    "words": [
+      "talking sword",
+      "witching hour",
+      "fleeting summer",
+      "missed connection",
+      "awkward brunch"
+    ]
+  },
+  {
+    "id": 27,
+    "words": [
+      "rogue satellite",
+      "secondhand sweat",
+      "magical intern",
+      "overheard playlist",
+      "cow costume"
+    ]
+  },
+  {
+    "id": 28,
+    "words": [
+      "moonbase karaoke",
+      "goblin mode",
+      "haunted spreadsheet",
+      "tangled headphones",
+      "haunted burrito"
+    ]
   }
 ]

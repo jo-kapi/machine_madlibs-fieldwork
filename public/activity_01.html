@@ -17,25 +17,14 @@
         <a href="activity_02.html">Activity 02</a>
         <a href="activity_03.html">Activity 03</a>
       </nav>
-      <button class="save-btn">↓ Download Text</button>
+      <div class="site-header__actions">
+        <button type="button" class="help-btn" aria-label="How this works">?</button>
+        <button type="button" class="restart-btn">New story</button>
+        <button class="save-btn">↓ Download Text</button>
+      </div>
     </header>
 
     <div class="info">
-      <details class="info__panel" data-remember="activity-01" open>
-        <summary>How this works</summary>
-        <div class="info__body">
-          <ol>
-            <li>The machine opens a story with one sentence.</li>
-            <li>Write the next sentence. The machine answers with the one after that.</li>
-            <li>
-              Keep trading sentences until the story reaches
-              <span data-max-words>350</span> words.
-            </li>
-            <li>Stuck? Draw a wild card for a twist.</li>
-            <li>Download your story when you're done.</li>
-          </ol>
-        </div>
-      </details>
       <details class="info__panel" data-peek="writer">
         <summary>Peek at the system prompt</summary>
         <div class="info__body"></div>
@@ -52,9 +41,12 @@
 
         <aside class="wildcard" hidden>
           <div class="wildcard__content">
-            <p class="wildcard__title"></p>
-            <p class="wildcard__text"></p>
-            <p class="wildcard__note"></p>
+            <p class="wildcard__label">Wild card</p>
+            <ul class="wildcard__words"></ul>
+            <p class="wildcard__note">
+              Use one of these in your next sentence. The machine will work in a different
+              one.
+            </p>
           </div>
           <button type="button" class="wildcard__dismiss" aria-label="Put the card back">
             ×
@@ -71,6 +63,7 @@
     </main>
 
     <script src="js/common.js"></script>
+    <script src="js/instructions.js"></script>
     <script src="js/activity-01.js"></script>
   </body>
 </html>

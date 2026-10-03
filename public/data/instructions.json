@@ -1,0 +1,36 @@
+{
+  "activity-01": {
+    "title": "Activity 01 · Micro-fictions",
+    "intro": "Explore short-form storytelling in conversation with a language model. Begin with some structure, then loosen the reins: take detours and bend the output into something unexpected, and possibly a little strange. Don’t aim for polish or perfection. Stay curious, test boundaries, and see what emerges.",
+    "steps": [
+      "The machine writes the first line. After that, take turns, one line at a time: yours, then the machine’s.",
+      "Add your creative twist. Use your turn to shift or disrupt the story: derail the plot, contradict the machine, or throw in something sudden.",
+      "Use your wild words. Draw a wild card and include at least one of its words or phrases in your story. The machine will work in a different one.",
+      "There are no edits. Once a line is written, it’s permanent.",
+      "The story ends at {maxWords} words. Download it, or press New story to try again."
+    ],
+    "note": "Want company? Pair up and share one device, taking turns."
+  },
+  "activity-02": {
+    "title": "Activity 02 · Visual Poetry",
+    "intro": "Turn words from the machine into a visual poem.",
+    "steps": [
+      "Type a theme and press Generate Words. Leave it blank for small words like “the” and “of”.",
+      "Click a word to put it on the canvas. Click it again to take it off.",
+      "Drag words around. Select one on the canvas to change its colour, tile colour, size or font.",
+      "For colours, type a hex code like #ff3b5b, or describe one (“burnt orange”) and the machine will choose.",
+      "Download your poem, or press Send to screen to show it to the room."
+    ]
+  },
+  "activity-03": {
+    "title": "Activity 03 · Temp Check",
+    "intro": "A game for the whole room about how predictable the machine is.",
+    "steps": [
+      "The host shows a sentence with a blank, here and on the big screen.",
+      "When the clock starts, type one word to fill the blank. You only get a few seconds.",
+      "Meanwhile the machine fills in the same blank again and again.",
+      "Be the machine: you score by how often the machine says your word. Beat the machine: you score 100 if neither the machine nor anyone else said your word.",
+      "Temperature decides how adventurous the machine is. Watch what happens to its answers as it rises."
+    ]
+  }
+}
