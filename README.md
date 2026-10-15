@@ -4,15 +4,21 @@ Workshop activities for **Poetry in Computation (Exploration Lab #2)**, organize
 
 Everything runs on one computer. The language model runs locally through [Ollama](https://ollama.com), so nothing is sent to the internet. Other people join from their own phones, tablets and laptops over Wi-Fi, without installing anything.
 
+> **About this repository.** It's a record of the workshop, kept online for the people who took part and for anyone who wants to run or adapt it. It isn't actively developed, so issues and pull requests may go unanswered. Forks are welcome (see [License](#license)).
+
+**Contents:** [The activities](#the-activities) · [Quick start](#quick-start-run-it-yourself) · [Facilitator guide](#facilitator-guide) · [Settings](#settings) · [How it works](#how-it-works) · [License](#license) · [Credits](#credits)
+
 ## The activities
 
-| Activity              | What you do                                                                                                                                                                                                                                                                                                                           |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **01 Micro-fictions** | Take turns with the machine writing a story, one sentence each. Draw a wild card of five words and phrases to work in, and start over any time. A **Craziness** slider sets how adventurous the machine is. Write in any language the model knows; it answers in the same one. The story runs to 250 words, then you can download it. |
-| **02 Visual Poetry**  | Ask for words on a theme (the **Craziness** slider sets how far from the obvious they stray), drag them around a canvas, style them (colors can be described in plain language), then download the image or send it to the shared screen.                                                                                             |
-| **03 Temp Check**     | Everyone types one word to complete a sentence while the machine does the same 20 times. Play to match the machine, or to beat it, and watch what raising the temperature does. At high temperatures the machine sometimes produces garbled text; the app filters it out and the host screen says how many replies were thrown out.   |
+**01 Micro-fictions.** Take turns with the machine writing a story, one sentence each. Draw a wild card of five words and phrases to work in, and start over any time. Write in any language the model knows; it answers in the same one. The story runs to 250 words, then you can download it.
 
-Every page has a **Peek at the system prompt** button that slides in a sheet showing the real instructions and settings the machine is given, with a plain-language note on what each part does. It also shows the app's version, which comes from `version` in `package.json`.
+**02 Visual Poetry.** Ask for words on a theme, drag them around a canvas, and style them (colors can be described in plain language). Then download the image or send it to the shared screen.
+
+**03 Temp Check.** Everyone types one word to complete a sentence while the machine does the same 20 times. Play to match the machine, or to beat it, and watch what raising the temperature does. At high temperatures the machine sometimes produces garbled text; the app filters it out and the host screen says how many replies were thrown out.
+
+**The Craziness slider.** Activities 01 and 02 have a slider from steady to wild. It sets how adventurous the machine is: toward steady it sticks to the safest words, toward wild it takes risks. It's the same setting that Activity 03 is about.
+
+Every activity page, and the host screen, has a **Peek at the system prompt** button that slides in a sheet showing the real instructions and settings the machine is given, with a plain-language note on what each part does. On pages with the slider it shows the values for where the slider is now. It also shows the app's version, which comes from `version` in `package.json`.
 
 ---
 
@@ -183,14 +189,16 @@ public/            Pages for participants
   activity_02.html   Visual Poetry
   activity_03.html   Temp Check (player screen)
   css/, js/          Styles (design tokens in css/tokens.css) and scripts
-  data/              Wild cards, Temp Check stems and rounds
+  data/              Wild cards, instruction cards, Temp Check stems and rounds
 host/              The host screen and gallery (served to the host computer only)
 server/            The Node server
   routes.js          Every route the pages call
   prompts.js         The system prompts and settings the machine is given
-  activities.js      Activities 1 and 2: build the request, call the model, tidy the reply
+  activities.js      Activities 01 and 02: build the request, call the model, tidy the reply
   game.js            The Temp Check game
 ```
+
+[`AGENTS.md`](AGENTS.md) has the full map of the code, the conventions it follows and the things that are easy to get wrong, for people and AI coding assistants alike.
 
 Handy commands:
 
@@ -199,16 +207,13 @@ Handy commands:
 | `npm start`   | Start the app                                  |
 | `npm run dev` | Start the app and restart it when code changes |
 
-## Contributing
-
-Issues and pull requests are welcome. [`AGENTS.md`](AGENTS.md) describes how the code is organized and the conventions it follows, for people and AI coding assistants alike.
-
 ## License
 
-[GNU General Public License v3.0](LICENSE).
+[GNU General Public License v3.0](LICENSE). You can run, study, change and share it under those terms.
 
 ## Credits
 
 - Created by [Kapilan Naidu](https://github.com/kapilan-naidu).
 - Made for **Poetry in Computation (Exploration Lab #2)**, organized by _jo+kapi_ as part of **_field:work_**.
-- Built with [Ollama](https://ollama.com), [Express](https://expressjs.com), and [p5.js](https://p5js.org).
+- Built with [Ollama](https://ollama.com), [Express](https://expressjs.com) and [p5.js](https://p5js.org).
+- Bundled third-party files: p5.js 2.3.4 (`public/js/p5.min.js`, LGPL-2.1) and [normalize.css](https://github.com/necolas/normalize.css) 8.0.1 (`public/css/normalize.css`, MIT). The typefaces are described in [`public/css/fonts/README.md`](public/css/fonts/README.md).

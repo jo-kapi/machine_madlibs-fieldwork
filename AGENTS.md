@@ -6,8 +6,9 @@ Guidance for anyone working on this repository, human or AI assistant.
 
 Machine Madlibs is a workshop kit: three activities that use a local language model
 (through Ollama) with a room of people on their own devices. One computer hosts; everyone
-else opens a web page. It is built for teaching and released as open source (GPL-3.0). Most
-users are artists and designers rather than developers, so **readable beats clever**.
+else opens a web page. It is built for teaching and released as open source (GPL-3.0), as a record of the
+workshop rather than a live project. Most users are artists and designers rather than
+developers, so **readable beats clever**.
 
 ## Commands
 
@@ -38,10 +39,16 @@ public/            What participants load (plain HTML, CSS and browser JavaScrip
   css/tokens.css     Every color, font and size. Re-theme here.
   css/base.css       Page shell, buttons, form controls and the Craziness slider
   css/overlays.css   Dialogs and the peek sheet
+  css/activity-0*.css, join.css   Styles for one page each
   data/              Wild cards, instruction cards, Temp Check stems and rounds: content, not code
   js/common.js       Helpers every page shares, on the MM object
+  js/activity-0*.js  One script per activity page; join.js is the join screen
+  js/peek.js         The "peek at the system prompt" sheet
+  js/instructions.js The "?" instructions card
+  js/sketch.js       The Visual Poetry canvas (p5.js, global mode)
   js/temp-check.js   What the Temp Check player and host screens share
 host/              The projector screen and gallery; served only to the host machine
+  host.js, gallery.js, host.css   The host screen, the gallery and their styles
 ```
 
 ## Conventions
@@ -125,6 +132,21 @@ These are the privacy and safety promises the README makes to participants.
   `mouseReleased`. There are no `touchStarted` handlers.
 - Temp Check state lives in `server/game.js`. Pages only display it, which is why
   refreshing a page or reconnecting a phone resumes the current phase.
+- The blank in a Temp Check sentence (`.stem__blank`) holds a non-breaking space
+  (`\u00a0`). An ordinary space collapses and the blank loses its height.
+
+## Safari
+
+Safari differs from Chrome in small ways that took tracking down. Test visual changes in
+both (WebKit through Playwright is enough to catch most of them).
+
+- Centered text in buttons sits 1 to 2px higher than in Chrome. `base.css` fixes it only
+  for Safari, inside `@supports (hanging-punctuation: first)`, which only Safari passes.
+- A range input's thumb needs the prefixed `-webkit-appearance: none`, and the
+  `::-moz-range-*` rules must stay outside the nested block, or Safari ignores the thumb
+  styles (the slider section of `base.css`).
+- Opening a dialog focuses its first button, and Safari draws a focus ring on it. Open
+  dialogs with `MM.openDialog`, which focuses the dialog itself.
 
 ## Testing
 
