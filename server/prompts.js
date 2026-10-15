@@ -15,6 +15,23 @@ const OPENING_LENGTHS = [
   "Let this one run a little longer: about 20 to 25 words.",
 ];
 
+// The Craziness slider (Activities 1 and 2) sends a number from 0 (steady) to 1 (wild).
+// The middle, 0.5, leaves each prompt's own settings as written below. Toward steady,
+// the temperature drops by up to `cooler`. Toward wild it rises by up to `hotter`, and
+// the pool of words the machine may pick from widens from Ollama's defaults (topP, topK)
+// to the values given. Raising the temperature alone shows very little, because those
+// defaults cut off the unlikely words; but with no cut-off at all the writing falls
+// apart, so the wild end stops short of it.
+export const CRAZINESS = {
+  default: 0.5,
+  cooler: 0.6,
+  hotter: 1.1,
+  minTemperature: 0.1,
+  maxTemperature: 2.0,
+  topP: { from: 0.9, to: 0.98 },
+  topK: { from: 40, to: 200 },
+};
+
 export const PROMPTS = {
   writer: {
     start: {
@@ -34,12 +51,19 @@ export const PROMPTS = {
       system:
         "You are a helpful writing assistant that will help users to craft a short story. " +
         "You are to respond with ONLY ONE sentence that continues the story. " +
+        "The story arrives as a conversation: the writer's sentences are the user's turns and yours are the assistant's. " +
+        "Continue directly from the writer's latest sentence and build on what they just wrote. " +
+        "Always write in the same language as the writer's most recent sentence: if they wrote in Japanese, answer in Japanese; " +
+        "if in Hindi, answer in Hindi. Only use English when they wrote in English. " +
         "Include just enough detail to continue the story. " +
         "Sometimes you are also given a few words or phrases to choose from: pick one and work it in naturally. " +
         "Never mention that you were given words, a list or a card. Reply with only the story sentence.",
       // Added after the story when the writer has drawn a wild card. {words} is the
       // card's words and phrases that the writer did not use themselves.
       twist: "Work one of these words or phrases into your next sentence: {words}.",
+      // Added last, after the writer's sentence (and the twist). Models drift back to
+      // English from a long English prompt unless they are reminded at the end.
+      reminder: "(Continue the story in the language of the sentence above.)",
       lengths: WRITER_LENGTHS,
       options: { temperature: 0.7, num_predict: 120 },
     },
@@ -52,6 +76,7 @@ export const PROMPTS = {
         "You are a helpful poetry assistant that will help users to craft poems. " +
         "You will respond with a list of 8 words (nouns, verbs, adverbs and adjectives suitable for writing a poem) " +
         "based on whatever input word or phrase you get from the user. " +
+        "Write the words in the same language as the input. " +
         "You are to only respond with the list of 8 words, all written in lowercase and each word separated by a comma.",
       options: { temperature: 0.9, num_predict: 60 },
     },

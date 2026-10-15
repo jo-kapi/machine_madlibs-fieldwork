@@ -94,7 +94,10 @@ async function handleKeywordSubmit(event) {
 
   await runBusy(keywordForm, async () => {
     // An empty keyword asks for filler words (articles and prepositions).
-    const { words } = await MM.api("poet", { theme: keyword });
+    const { words } = await MM.api("poet", {
+      theme: keyword,
+      craziness: MM.craziness(),
+    });
     appendWords(words);
     keywordInput.value = "";
   });

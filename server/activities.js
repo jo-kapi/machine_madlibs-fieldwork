@@ -1,6 +1,6 @@
 // One function per activity: build the request, call the model, clean the reply.
 // Replies are parsed here so the browser only ever receives tidy data.
-import { PROMPTS } from "./prompts.js";
+import { PROMPTS, CRAZINESS } from "./prompts.js";
 import { chat, OllamaError } from "./ollama.js";
 import { InputError } from "./errors.js";
 import { findCard } from "./wildcards.js";
@@ -18,6 +18,35 @@ function shortText(value, label) {
   return text;
 }
 
+// The slider's position, from 0 to 1. Pages without a slider send nothing, which means
+// the middle.
+export function parseCraziness(value) {
+  if (value === undefined || value === null) return CRAZINESS.default;
+  if (typeof value !== "number" || !(value >= 0 && value <= 1)) {
+    throw new InputError("craziness must be a number from 0 to 1.");
+  }
+  return value;
+}
+
+// Returns the prompt's sampling options as the slider changes them (see CRAZINESS).
+export function withCraziness(options, craziness = CRAZINESS.default) {
+  if (options.temperature === undefined) return options;
+  const { cooler, hotter, minTemperature, maxTemperature, topP, topK } = CRAZINESS;
+  const away = (craziness - CRAZINESS.default) * 2; // -1 (steady) to 1 (wild)
+
+  const moved = options.temperature + (away < 0 ? away * cooler : away * hotter);
+  const temperature = Math.min(maxTemperature, Math.max(minTemperature, moved));
+  const result = { ...options, temperature: round(temperature, 2) };
+
+  if (away > 0) {
+    result.top_p = round(topP.from + away * (topP.to - topP.from), 2);
+    result.top_k = Math.round(topK.from + away * (topK.to - topK.from));
+  }
+  return result;
+}
+
+const round = (number, places) => Math.round(number * 10 ** places) / 10 ** places;
+
 // Keeps the first sentence-sized chunk and drops a trailing fragment that was
 // cut off by the token limit.
 export function tidySentence(text) {
@@ -30,14 +59,19 @@ export function tidySentence(text) {
     .replace(/^(AI|You):\s*/i, "")
     .trim();
   clean = clean.replace(/^["“](.*)["”]$/, "$1");
-  if (/[.!?…]["”')]?$/.test(clean)) return clean;
+  if (/[.!?…。！？؟।]["”')」』]?$/.test(clean)) return clean;
   const lastEnd = Math.max(
     clean.lastIndexOf(". "),
     clean.lastIndexOf("! "),
-    clean.lastIndexOf("? ")
+    clean.lastIndexOf("? "),
+    // Full stops of other scripts are not followed by a space.
+    ...[..."。！？؟।"].map((mark) => clean.lastIndexOf(mark))
   );
   return lastEnd > 0 ? clean.slice(0, lastEnd + 1) : clean;
 }
+
+// Commas as other languages write them: full-width, ideographic and Arabic.
+const COMMAS = /[,，、،]/;
 
 // Models sometimes wrap the list in chatter such as "Here is your list:". Text
 // before a colon is dropped, and when some lines are comma-separated lists the
@@ -45,16 +79,20 @@ export function tidySentence(text) {
 export function parseWords(text, max = Infinity) {
   const lines = text
     .split("\n")
-    .map((line) => line.slice(line.lastIndexOf(":") + 1))
+    .map((line) =>
+      line.slice(Math.max(line.lastIndexOf(":"), line.lastIndexOf("：")) + 1)
+    )
     .filter((line) => line.trim());
-  const hasList = lines.some((line) => line.includes(","));
-  const source = (hasList ? lines.filter((line) => line.includes(",")) : lines).join(",");
+  const hasList = lines.some((line) => COMMAS.test(line));
+  const source = (hasList ? lines.filter((line) => COMMAS.test(line)) : lines).join(",");
   const words = source
     .toLowerCase()
-    .split(",")
+    .split(COMMAS)
     .map((word) =>
       word
-        .replace(/[^\p{L}\s'-]/gu, "")
+        // Letters, plus the marks that vowels and accents are written with in many
+        // scripts (Hindi, Tamil, Arabic) and the joiners between letters.
+        .replace(/[^\p{L}\p{M}\u200c\u200d\s'-]/gu, "")
         .replace(/\s+/g, " ")
         .trim()
     )
@@ -86,16 +124,35 @@ export function cardChoices(words, humanSentence) {
   return words.filter((word) => !sentence.includes(plain(word)));
 }
 
+// The story so far as a conversation. The last sentence is the writer's, the one before
+// it the machine's, and so on back. Sent as one block of text the machine often carried
+// on with its own idea; sent this way it can tell its sentences from the writer's and
+// answers the latest one.
+export function storyMessages(story) {
+  const parts = story.map((part) => part.trim()).filter(Boolean);
+  const messages = parts.map((content, index) => ({
+    role: (parts.length - 1 - index) % 2 === 0 ? "user" : "assistant",
+    content,
+  }));
+  // A conversation starts with the user, and the machine's opening line is its answer.
+  if (messages[0]?.role === "assistant") {
+    messages.unshift({ role: "user", content: "Begin a new story." });
+  }
+  return messages;
+}
+
 // `story` is the sentences so far, alternating between the AI and the human.
 // `cardId` names a wild card. The machine works one of its words into its next
 // sentence, a different one from the writer's, and doesn't mention the card.
-export async function writer({ mode, story = [], cardId, signal }) {
+export async function writer({ mode, story = [], cardId, craziness, signal }) {
+  const slider = parseCraziness(craziness);
+
   if (mode === "start") {
     const { system, lengths, options } = PROMPTS.writer.start;
     const { text } = await chat({
       system: withLength(system, lengths),
       user: "Begin a new story.",
-      options,
+      options: withCraziness(options, slider),
       signal,
     });
     return { text: tidySentence(text) };
@@ -108,45 +165,47 @@ export async function writer({ mode, story = [], cardId, signal }) {
   if (story.some((part) => typeof part !== "string")) {
     throw new InputError("story must be a list of sentences.");
   }
-  const joined = story
-    .map((part) => part.trim())
-    .filter(Boolean)
-    .join(" ");
-  if (!joined || joined.length > MAX_STORY_CHARS) {
+  const messages = storyMessages(story);
+  const totalLength = messages.reduce((sum, message) => sum + message.content.length, 0);
+  if (messages.length === 0 || totalLength > MAX_STORY_CHARS) {
     throw new InputError("The story is empty or too long.");
   }
 
-  const { system, lengths, options, twist } = PROMPTS.writer.continue;
-  let user = joined;
+  // The twist and the reminder go on the end of the writer's latest sentence.
+  const { system, lengths, options, twist, reminder } = PROMPTS.writer.continue;
+  const latest = messages.at(-1);
   if (cardId !== undefined && cardId !== null) {
     const card = await findCard(cardId);
     if (!card) throw new InputError("Unknown wild card.");
     if (Array.isArray(card.words)) {
       // The last sentence is the writer's, so the machine picks a different word.
       const choices = cardChoices(card.words, story.at(-1));
-      if (choices.length > 0)
-        user += `\n\n${twist.replace("{words}", choices.join(", "))}`;
+      if (choices.length > 0) {
+        latest.content += `\n\n${twist.replace("{words}", choices.join(", "))}`;
+      }
     }
   }
+  latest.content += `\n\n${reminder}`;
 
   const { text } = await chat({
     system: withLength(system, lengths),
-    user,
-    options,
+    messages,
+    options: withCraziness(options, slider),
     signal,
   });
   return { text: tidySentence(text) };
 }
 
 // An empty theme asks for filler words (articles and prepositions).
-export async function poet({ theme, signal }) {
+export async function poet({ theme, craziness, signal }) {
   const input = shortText(theme ?? "", "Theme");
+  const slider = parseCraziness(craziness);
   const filler = input === "";
   const { system, options } = filler ? PROMPTS.poet.filler : PROMPTS.poet.words;
   const { text } = await chat({
     system,
     user: filler ? "Give me the words." : input,
-    options,
+    options: withCraziness(options, slider),
     signal,
   });
   const words = parseWords(text, filler ? 5 : 8);

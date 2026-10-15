@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/forms.css" />
     <link rel="stylesheet" href="css/dialogs.css" />
     <link rel="stylesheet" href="css/peek.css" />
+    <link rel="stylesheet" href="css/craziness.css" />
     <link rel="stylesheet" href="css/activity-02.css" />
   </head>
   <body class="page--fit-wide">
@@ -66,12 +67,27 @@
                 name="keyword"
                 id="input-keyword"
                 class="input"
+                dir="auto"
                 maxlength="100"
                 placeholder="A theme, or blank for filler"
                 aria-label="Theme"
               />
               <button type="submit" class="btn btn--large">Generate</button>
             </form>
+
+            <label class="craziness">
+              <span class="craziness__label">Craziness</span>
+              <span class="craziness__end" aria-hidden="true">Steady</span>
+              <input
+                class="craziness__input"
+                type="range"
+                min="0"
+                max="10"
+                step="1"
+                value="5"
+              />
+              <span class="craziness__end" aria-hidden="true">Wild</span>
+            </label>
             <div class="words"></div>
           </section>
 

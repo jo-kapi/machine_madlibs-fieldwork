@@ -79,7 +79,7 @@ const Peek = (() => {
       wordsLoading ??= loadWords();
       const [words, ...replies] = await Promise.all([
         wordsLoading,
-        ...activities.map((activity) => MM.api(`prompts/${activity}`)),
+        ...activities.map((activity) => MM.api(`prompts/${activity}${sliderQuery()}`)),
       ]);
       if (thisOpening === openCount) render(activities, replies, words);
     } catch (error) {
@@ -87,6 +87,12 @@ const Peek = (() => {
         bodyElement.replaceChildren(MM.el("p", "peek__status", error.message));
       }
     }
+  }
+
+  // On pages with a Craziness slider, the sheet shows the settings for where it is set.
+  function sliderQuery() {
+    const craziness = MM.craziness();
+    return craziness === undefined ? "" : `?craziness=${craziness}`;
   }
 
   // ---------- drawing the content ----------
@@ -99,7 +105,7 @@ const Peek = (() => {
         const { group, name } = splitLabel(prompt.label);
         if (group) groups.add(group);
         const hint = words.prompts?.[activities[index]]?.[key];
-        sections.push(promptSection(name, hint, prompt, words));
+        sections.push(promptSection(name, hint, prompt, words, reply.adjusted));
       }
     });
 
@@ -136,7 +142,7 @@ const Peek = (() => {
     return row;
   }
 
-  function promptSection(name, hint, prompt, words) {
+  function promptSection(name, hint, prompt, words, adjusted) {
     const section = MM.el("section", "peek__section");
     section.append(MM.el("h3", "peek__label", name));
     if (hint) section.append(MM.el("p", "peek__hint", hint));
@@ -150,7 +156,14 @@ const Peek = (() => {
     if (prompt.twist) {
       section.append(extraBlock("Added with a wild card", words.twist, prompt.twist));
     }
-    section.append(settingsBlock(prompt.options, words.settings ?? {}));
+    if (prompt.reminder) {
+      section.append(
+        extraBlock("Added after your sentence", words.reminder, prompt.reminder)
+      );
+    }
+    section.append(
+      settingsBlock(prompt.options, words.settings ?? {}, adjusted ? words.craziness : "")
+    );
     return section;
   }
 
@@ -164,7 +177,9 @@ const Peek = (() => {
   }
 
   // The sampling options, each as a small chip with a plain-language note beside it.
-  function settingsBlock(options, hints) {
+  // `sliderNote` is added to the temperature's note on pages where the Craziness slider
+  // changes the settings.
+  function settingsBlock(options, hints, sliderNote) {
     const block = MM.el("div", "peek__extra");
     block.append(MM.el("h4", "peek__sublabel", "Settings"));
 
@@ -175,7 +190,9 @@ const Peek = (() => {
         MM.el("span", "peek__chip-name", name),
         MM.el("span", "", String(value))
       );
-      list.append(chip, MM.el("dd", "peek__hint", hints[name] ?? ""));
+      const note =
+        name === "temperature" ? `${hints[name] ?? ""} ${sliderNote}` : hints[name];
+      list.append(chip, MM.el("dd", "peek__hint", (note ?? "").trim()));
     }
     block.append(list);
     return block;

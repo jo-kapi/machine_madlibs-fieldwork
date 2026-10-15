@@ -1,9 +1,9 @@
 {
-  "intro": "This is exactly what the machine is told, and how it is set up. It lives on the host's computer, so nothing in your browser can change it.",
+  "intro": "This is exactly what the machine is told, and how it is set up. It lives on the host's computer, so nothing in your browser can change it, apart from the temperature on pages with a Craziness slider.",
   "prompts": {
     "writer": {
       "start": "Used once, to write the story's opening line.",
-      "continue": "Used every time the machine answers one of your sentences."
+      "continue": "Used every time the machine answers one of your sentences. The story so far is sent as a conversation, your sentences as yours and its own as its, so it knows which is which."
     },
     "poet": {
       "words": "Turns your theme into the words that land on the canvas.",
@@ -17,7 +17,9 @@
     }
   },
   "lengths": "One of these lines is added at random each turn, so sentences swing between short and long.",
+  "reminder": "Added after your latest sentence, so the machine answers in the language you wrote in.",
   "twist": "Added after the story when you have drawn a wild card. {words} becomes the card's words that you haven't used yet, so the machine picks a different one.",
+  "craziness": "Moved by the Craziness slider; this is the value for where it is now. Toward wild it also raises top_p and top_k.",
   "settings": {
     "temperature": "How adventurous the machine is. Low sticks to the safest word; high takes risks.",
     "num_predict": "The longest reply allowed, counted in tokens (small chunks of words).",

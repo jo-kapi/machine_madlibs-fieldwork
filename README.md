@@ -6,11 +6,11 @@ Everything runs on one computer. The language model runs locally through [Ollama
 
 ## The activities
 
-| Activity              | What you do                                                                                                                                                                                                                                                                                                                         |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **01 Micro-fictions** | Take turns with the machine writing a story, one sentence each. Draw a wild card of five words and phrases to work in, and start over any time. The story runs to 250 words, then you can download it.                                                                                                                              |
-| **02 Visual Poetry**  | Ask for words on a theme, drag them around a canvas, style them (colours can be described in plain language), then download the image or send it to the shared screen.                                                                                                                                                              |
-| **03 Temp Check**     | Everyone types one word to complete a sentence while the machine does the same 20 times. Play to match the machine, or to beat it, and watch what raising the temperature does. At high temperatures the machine sometimes produces garbled text; the app filters it out and the host screen says how many replies were thrown out. |
+| Activity              | What you do                                                                                                                                                                                                                                                                                                                           |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **01 Micro-fictions** | Take turns with the machine writing a story, one sentence each. Draw a wild card of five words and phrases to work in, and start over any time. A **Craziness** slider sets how adventurous the machine is. Write in any language the model knows; it answers in the same one. The story runs to 250 words, then you can download it. |
+| **02 Visual Poetry**  | Ask for words on a theme (the **Craziness** slider sets how far from the obvious they stray), drag them around a canvas, style them (colors can be described in plain language), then download the image or send it to the shared screen.                                                                                             |
+| **03 Temp Check**     | Everyone types one word to complete a sentence while the machine does the same 20 times. Play to match the machine, or to beat it, and watch what raising the temperature does. At high temperatures the machine sometimes produces garbled text; the app filters it out and the host screen says how many replies were thrown out.   |
 
 Every page has a **Peek at the system prompt** button that slides in a sheet showing the real instructions and settings the machine is given, with a plain-language note on what each part does. It also shows the app's version, which comes from `version` in `package.json`.
 
@@ -138,6 +138,7 @@ Temp Check runs about twelve rounds, ending with a finale where everyone's Hot a
 | Wild cards for Activity 01                              | `public/data/wildcards.json` (each card is five words or phrases; the writer and the machine both have to use one) |
 | Temp Check sentences                                    | `public/data/stems.json` (use `___` for the blank)                                                                 |
 | Temp Check rounds, temperatures, timer and scoring mode | `public/data/rounds.json`                                                                                          |
+| How far the Craziness slider can push the machine       | `CRAZINESS` in `server/prompts.js`                                                                                 |
 | What the machine is told                                | `server/prompts.js`                                                                                                |
 | Colours and fonts                                       | `public/css/tokens.css` (the font files are in `public/css/fonts/`)                                                |
 
@@ -147,7 +148,7 @@ The data files are read each time a game starts or a card is drawn, so you don't
 
 - Nothing is saved to disk. Names, pronouns, images and scores live in the server's memory and disappear when you stop it.
 - Pronouns are shown only next to a poem in the gallery, never on the leaderboard, and are never logged.
-- Participants' devices never talk to Ollama directly, and they can't change the prompts or settings the machine is given.
+- Participants' devices never talk to Ollama directly, and they can't change the prompts the machine is given. The one setting they can move is how adventurous it is, through the **Craziness** slider in Activities 01 and 02. The server checks that value and keeps it within fixed limits.
 - The app makes no requests to the internet while running.
 
 ---

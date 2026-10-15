@@ -66,7 +66,10 @@ These are the privacy and safety promises the README makes to participants.
 - Nothing is written to disk. Names, pronouns, images and scores live in memory only.
 - Never log user text or pronouns. Pronouns appear only beside a poem in the gallery.
 - Browsers never talk to Ollama. They call this app's `/api` routes, and system prompts
-  and sampling options are set on the server so a client cannot change them.
+  and sampling options are set on the server so a client cannot change them. The one
+  exception is the Craziness slider (Activities 1 and 2): the browser sends a number from
+  0 to 1, and the server validates it and turns it into temperature, `top_p` and `top_k`
+  within fixed limits (`CRAZINESS` in `prompts.js`).
 - `/host` and `/api/host/*` answer only to the machine running the server. The check uses
   the connection's address, never a header the client controls.
 - No analytics and no third-party requests at runtime. Fonts, p5.js and everything else
@@ -94,6 +97,16 @@ These are the privacy and safety promises the README makes to participants.
 - Ollama reloads the model if `num_ctx` changes between requests, which causes long
   pauses. The server sets one fixed value (`NUM_CTX`) on every request. Don't vary it.
 - Requests send `think: false` so reasoning models don't spend time on hidden tokens.
+- Models drift back to English unless told otherwise. Activity 1 therefore sends the story
+  as a conversation (the writer's sentences as user turns, the machine's as assistant
+  turns), puts the language rule in the system prompt, and adds a short reminder after the
+  writer's latest sentence (`reminder` in `prompts.js`). Without the reminder, Chinese and
+  Hindi often came back in English. Activity 2 asks for words in the theme's language.
+  Word lists are parsed with `\p{M}` kept and non-English commas accepted, or Hindi and
+  Tamil words lose their vowel signs.
+- Temperature alone barely changes writing, because Ollama's default `top_p` and `top_k`
+  cut off unlikely words. With no cut-off at all the model falls apart around
+  temperature 1.3. The slider's wild end therefore widens both, but stops short.
 - Temp Check uses its own model (`TEMP_MODEL`), because instruction-tuned models differ
   hugely in how much their answers spread out as temperature rises. Some barely change.
 - At high temperature models glue junk onto words. `looksLikeWord` in `server/words.js`

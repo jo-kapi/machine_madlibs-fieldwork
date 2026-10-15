@@ -13,9 +13,12 @@ export class OllamaError extends Error {
   }
 }
 
+// Pass `system` and `user` for a single question, or `messages` (a list of
+// { role, content }) for a conversation; the system prompt always goes first.
 export async function rawChat({
   system,
   user,
+  messages = [{ role: "user", content: user }],
   options = {},
   model = config.model,
   timeoutMs = config.requestTimeoutMs,
@@ -34,10 +37,7 @@ export async function rawChat({
         stream: false,
         // Reasoning models would otherwise spend time on hidden thinking tokens.
         think: false,
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
+        messages: [{ role: "system", content: system }, ...messages],
         options: { num_ctx: config.numCtx, ...options },
       }),
       signal: combined,

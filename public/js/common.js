@@ -108,6 +108,38 @@ const MM = (() => {
     if (element) element.hidden = true;
   }
 
+  // ---------- words ----------
+
+  // Scripts written without spaces between words. A run of these needs the browser's
+  // word segmenter; splitting on spaces would count a whole sentence as one word.
+  const UNSPACED =
+    /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}]/u;
+  let segmenter = null;
+
+  // How many words `text` has, in any language. Everything else is split on spaces, so
+  // English counts come out as people expect.
+  function countWords(text) {
+    let count = 0;
+    for (const token of text.split(/\s+/).filter(Boolean)) {
+      if (UNSPACED.test(token) && typeof Intl.Segmenter === "function") {
+        segmenter ??= new Intl.Segmenter(undefined, { granularity: "word" });
+        for (const part of segmenter.segment(token)) if (part.isWordLike) count++;
+      } else {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  // ---------- craziness ----------
+
+  // Where the Craziness slider is set, from 0 (steady) to 1 (wild). Undefined on pages
+  // without one. The server turns it into temperature settings (see server/prompts.js).
+  function craziness() {
+    const slider = document.querySelector(".craziness__input");
+    return slider ? Number(slider.value) / Number(slider.max) : undefined;
+  }
+
   // ---------- waiting ----------
 
   // Three dots that bounce in turn (the .dots styles are in buttons.css). Pass a label
@@ -243,6 +275,8 @@ const MM = (() => {
     requireIdentity,
     notice,
     clearNotice,
+    craziness,
+    countWords,
     dots,
     setBusy,
     openDialog,

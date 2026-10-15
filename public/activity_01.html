@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/forms.css" />
     <link rel="stylesheet" href="css/dialogs.css" />
     <link rel="stylesheet" href="css/peek.css" />
+    <link rel="stylesheet" href="css/craziness.css" />
     <link rel="stylesheet" href="css/activity-01.css" />
   </head>
   <body class="page--fit">
@@ -95,6 +96,7 @@
           <input
             class="input"
             type="text"
+            dir="auto"
             maxlength="400"
             aria-label="Your next sentence"
           />
@@ -115,7 +117,22 @@
             </svg>
           </button>
         </form>
-        <p class="word-count"></p>
+        <div class="prompt-meta">
+          <label class="craziness">
+            <span class="craziness__label">Craziness</span>
+            <span class="craziness__end" aria-hidden="true">Steady</span>
+            <input
+              class="craziness__input"
+              type="range"
+              min="0"
+              max="10"
+              step="1"
+              value="5"
+            />
+            <span class="craziness__end" aria-hidden="true">Wild</span>
+          </label>
+          <p class="word-count"></p>
+        </div>
       </section>
     </main>
 

@@ -3,7 +3,7 @@
 import express, { Router } from "express";
 import { config, modelsInUse } from "./config.js";
 import { PROMPTS } from "./prompts.js";
-import { writer, poet, color } from "./activities.js";
+import { writer, poet, color, parseCraziness, withCraziness } from "./activities.js";
 import { limiter, listModels, hasModel } from "./ollama.js";
 import { join, getSession } from "./sessions.js";
 import { InputError } from "./errors.js";
@@ -50,13 +50,29 @@ export function createApiRouter({ game, gallery }) {
   router.use(createGameRouter({ game, gallery }));
 
   // What the "peek at the system prompt" panel shows. For Temp Check it also
-  // includes the temperature currently in play.
+  // includes the temperature currently in play. The pages with a Craziness slider
+  // send its position (?craziness=0.7), so the temperatures shown are the real ones.
   router.get("/prompts/:activity", (req, res) => {
-    const prompts = PROMPTS[req.params.activity];
+    const activity = req.params.activity;
+    let prompts = PROMPTS[activity];
     if (!prompts) return res.status(404).json({ error: "Unknown activity." });
-    const live = req.params.activity === "temp" ? game.liveSampling() : undefined;
-    const model = req.params.activity === "temp" ? config.tempModel : config.model;
-    res.json({ model, prompts, live });
+
+    const adjusted = activity === "writer" || activity === "poet";
+    if (adjusted) {
+      const { craziness } = req.query;
+      const slider = parseCraziness(
+        craziness === undefined ? undefined : Number(craziness)
+      );
+      prompts = Object.fromEntries(
+        Object.entries(prompts).map(([key, prompt]) => [
+          key,
+          { ...prompt, options: withCraziness(prompt.options, slider) },
+        ])
+      );
+    }
+    const live = activity === "temp" ? game.liveSampling() : undefined;
+    const model = activity === "temp" ? config.tempModel : config.model;
+    res.json({ model, prompts, live, adjusted });
   });
 
   // Settings the pages need.

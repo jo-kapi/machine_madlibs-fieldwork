@@ -85,11 +85,7 @@ function restoreStory() {
 }
 
 function wordCount() {
-  return story
-    .map((turn) => turn.text)
-    .join(" ")
-    .split(/\s+/)
-    .filter(Boolean).length;
+  return MM.countWords(story.map((turn) => turn.text).join(" "));
 }
 
 function handleSubmit(event) {
@@ -137,11 +133,12 @@ async function requestAiTurn() {
 
   const body =
     story.length === 0
-      ? { mode: "start" }
+      ? { mode: "start", craziness: MM.craziness() }
       : {
           mode: "continue",
           story: story.map((turn) => turn.text),
           cardId: turnCard?.id,
+          craziness: MM.craziness(),
         };
 
   let reply = null;
@@ -200,7 +197,9 @@ function turnElement(turn) {
   paragraph.className = `story__turn story__turn--${turn.role}`;
 
   const speaker = MM.el("span", "story__speaker", turn.role === "ai" ? "AI" : "You");
-  paragraph.append(speaker, MM.el("span", "story__text", turn.text));
+  const text = MM.el("span", "story__text", turn.text);
+  text.dir = "auto"; // right-to-left languages read from the right
+  paragraph.append(speaker, text);
 
   if (turn.card) paragraph.append(cardNote(turn));
   return paragraph;
@@ -401,7 +400,7 @@ function downloadText() {
   }
 
   const text = story.map((turn) => turn.text).join(" ");
-  const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+  const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
 
   const link = document.createElement("a");
   link.href = url;
