@@ -11,7 +11,11 @@
   align-items: center;
   justify-content: center;
 
-  min-height: var(--control-height);
+  --btn-height: var(--control-height);
+  --label-lift: calc(
+    var(--btn-height) / 2 - 2px - 0.568em
+  ); /* see SAFARI LABEL CENTERING */
+  min-height: var(--btn-height);
   padding-inline: var(--space-md);
   border: solid thin var(--color-border-strong);
   border-radius: var(--radius-pill);
@@ -23,9 +27,14 @@
   cursor: pointer;
   transition: all var(--transition);
 
-  &:hover:not(:disabled) {
+  &:is(:hover, :focus-visible):not(:disabled) {
     border-color: var(--color-text);
     background: var(--color-surface-hover);
+  }
+
+  /* Keyboard focus looks like hover, so there is no extra ring. */
+  &:focus-visible {
+    outline: none;
   }
 
   &:disabled {
@@ -47,6 +56,11 @@
       background: var(--color-invert-bg);
       color: var(--color-invert-text);
     }
+
+    /* Focus only darkens the border; filling it black would be louder than a ring. */
+    &:focus-visible:not(:disabled) {
+      border-color: var(--color-text);
+    }
   }
 
   &.btn--icon {
@@ -55,13 +69,13 @@
   }
 
   &.btn--small {
-    min-height: 2rem;
+    --btn-height: 2rem;
     padding-inline: 0.8rem;
     font-size: var(--text-sm);
   }
 
   &.btn--large {
-    min-height: var(--control-height-large);
+    --btn-height: var(--control-height-large);
 
     &.btn--icon {
       width: var(--control-height-large);
@@ -90,18 +104,43 @@
   }
 
   &.btn--close {
+    --btn-height: 2rem;
     width: 2rem;
-    min-height: 2rem;
     padding: 0;
     border-color: transparent;
     color: var(--color-text-muted);
-    font-size: var(--text-xl);
-    line-height: 1;
 
-    &:hover:not(:disabled) {
+    /* The cross is drawn rather than typed: a font's × sits off-center, and by a different
+       amount in each browser. The typed × stays in the markup but is hidden. The stroke
+       matches the asterisk icon. */
+    font-size: 0;
+
+    &::before {
+      content: "";
+      width: 0.7rem;
+      height: 0.7rem;
+      background: currentColor;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1 1l8 8M9 1L1 9' fill='none' stroke='%23000' stroke-width='1.8'/%3E%3C/svg%3E")
+        center / contain no-repeat;
+    }
+
+    &:is(:hover, :focus-visible):not(:disabled) {
       border-color: transparent;
       background: var(--color-surface-hover);
       color: var(--color-text);
+    }
+  }
+
+  /* SAFARI LABEL CENTERING
+     Safari rounds text metrics differently, which leaves labels centered with
+     align-items 1 to 2px too high. There the label sits on the bottom edge instead,
+     lifted by padding that puts the middle of the capitals on the middle of the button.
+     The test is a feature only Safari has. Symbols (icon and close buttons) are centered
+     by their shapes and skip this. */
+  @supports (hanging-punctuation: first) {
+    &:not(.btn--icon, .btn--close) {
+      align-items: flex-end;
+      padding-bottom: var(--label-lift);
     }
   }
 }

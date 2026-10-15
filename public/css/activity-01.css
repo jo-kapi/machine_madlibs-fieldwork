@@ -271,14 +271,13 @@
     opacity: 0.5;
   }
 
-  /* The wild card button holds an asterisk, and send holds an arrow (both .btn). */
-  & .prompt__card svg {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-
-  & .prompt__send {
-    font-size: 20px;
+  /* The wild card button holds an asterisk, and send holds an arrow (both .btn). The
+     icons are drawn, not typed, so they sit at the exact center. 20px, because the
+     round button is 40px inside its border: an odd size would land half a pixel off. */
+  & .prompt__card svg,
+  & .prompt__send svg {
+    width: 20px;
+    height: 20px;
   }
 }
 

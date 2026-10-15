@@ -139,6 +139,15 @@ const MM = (() => {
 
   // ---------- dialogs ----------
 
+  // Opens a <dialog> with the focus on the dialog itself. Left alone, the browser focuses
+  // the first button inside, and Safari draws a focus ring on it before anyone has
+  // touched the keyboard. Tab still moves on to the buttons.
+  function openDialog(dialog) {
+    dialog.tabIndex = -1;
+    dialog.showModal();
+    dialog.focus();
+  }
+
   // Closes a <dialog> after its fade-out has played. Adding "dialog--closing" starts the
   // closing animations in the CSS; the dialog is closed when they are done. People who
   // prefer less motion get no animation, so there is nothing to wait for.
@@ -236,6 +245,7 @@ const MM = (() => {
     clearNotice,
     dots,
     setBusy,
+    openDialog,
     closeDialog,
     confirm: confirmDialog,
     timestamp,

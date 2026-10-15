@@ -15,6 +15,12 @@ dialog::backdrop {
   }
 }
 
+/* A dialog takes focus itself when it opens (see MM.openDialog), so no button inside it
+   shows a focus ring before anyone has pressed a key. */
+dialog:focus-visible {
+  outline: none;
+}
+
 /* The scrim fades in, and out again when the script adds .dialog--closing (see
    MM.closeDialog in common.js). */
 @media (prefers-reduced-motion: no-preference) {

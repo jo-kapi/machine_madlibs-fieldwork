@@ -81,9 +81,9 @@ const Instructions = (() => {
 
     const dialog = build(content, values);
     document.body.append(dialog);
-    button?.addEventListener("click", () => dialog.showModal());
+    button?.addEventListener("click", () => MM.openDialog(dialog));
     dialog.addEventListener("close", () => markSeen(key));
-    if (!hasSeen(key)) dialog.showModal();
+    if (!hasSeen(key)) MM.openDialog(dialog);
   }
 
   return { init };

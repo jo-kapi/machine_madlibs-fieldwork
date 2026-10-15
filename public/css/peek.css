@@ -13,9 +13,13 @@
   cursor: pointer;
   transition: all var(--transition);
 
-  &:hover {
+  &:is(:hover, :focus-visible) {
     border-color: var(--color-border-strong);
     color: var(--color-text);
+  }
+
+  &:focus-visible {
+    outline: none;
   }
 }
 
@@ -112,6 +116,13 @@
   gap: var(--space-lg);
   padding: var(--space-lg);
   overflow-y: auto;
+
+  /* Browsers let keyboard users focus a scrolling area so they can scroll it. A full ring
+     around the whole body is too loud, and the sheet would clip it, so draw it inside. */
+  &:focus-visible {
+    outline: solid thin var(--color-border-strong);
+    outline-offset: -1px;
+  }
 }
 
 /* The version, in a quiet strip at the foot of the sheet. */

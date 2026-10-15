@@ -4,9 +4,12 @@
   box-sizing: border-box;
 }
 
+/* Keyboard focus: a thin ring that hugs the element, so on a bordered pill it reads as
+   a darker border rather than a second outline. Buttons go further and reuse their
+   hover look (see buttons.css). */
 :focus-visible {
-  outline: 2px solid var(--color-text);
-  outline-offset: 2px;
+  outline: solid thin var(--color-text);
+  outline-offset: 0;
 }
 
 html {
@@ -144,9 +147,13 @@ main {
 
   transition: all var(--transition);
 
-  &:hover {
+  &:is(:hover, :focus-visible) {
     background: var(--color-surface-hover);
     color: var(--color-text);
+  }
+
+  &:focus-visible {
+    outline: none;
   }
 
   /* The page you are on: an accent outline with a low-opacity accent fill. */
@@ -162,6 +169,15 @@ main {
    used for the other small labels. */
 .site-header__help {
   font-family: var(--font-mono);
+
+  /* A letter-like symbol, so Safari centers it like a label (see .btn). The extra class
+     outranks .btn--icon, which loads later. */
+  @supports (hanging-punctuation: first) {
+    &.btn.btn--icon {
+      align-items: flex-end;
+      padding-bottom: var(--label-lift);
+    }
+  }
 }
 
 /* TOOLBAR

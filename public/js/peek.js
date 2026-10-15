@@ -73,7 +73,7 @@ const Peek = (() => {
     titleElement.textContent = "System prompt";
     bodyElement.replaceChildren(MM.el("p", "peek__status", "Loading…"));
     bodyElement.scrollTop = 0;
-    if (!dialog.open) dialog.showModal();
+    if (!dialog.open) MM.openDialog(dialog);
 
     try {
       wordsLoading ??= loadWords();
