@@ -1,17 +1,16 @@
-// Temp Check, player side. The server holds the game; this page shows whatever
-// phase it is in and sends back this player's word (or Hot/Cold votes).
-//
-// Screens are built once per phase and then updated in place, so typing is
-// never wiped by other players' activity.
+// Temp Check, player side. The server holds the game; this page shows whatever phase
+// it is in and sends back this player's word (or Hot/Cold votes). Screens are built
+// once and then updated in place, so typing is never wiped by other players' activity.
+const { MODE_TITLES, stemElement } = TempCheck;
+
 const stage = document.querySelector(".temp__stage");
 const statusLine = document.querySelector(".temp__status");
 
 let view = null; // the latest state from the server
-let clockOffset = 0; // server time minus this device's clock, in ms
+let clockOffset = 0; // see TempCheck.clockOffset
 let stageKey = ""; // which screen is currently built
 let refs = {}; // elements that are updated in place
 
-const MODE_TITLES = { match: "Be the machine", beat: "Beat the machine" };
 const MODE_RULES = {
   match:
     "Type the word the machine is most likely to say. The more of its tries match yours, the more points you get.",
@@ -42,7 +41,7 @@ function connect() {
 
   source.onmessage = (event) => {
     view = JSON.parse(event.data);
-    clockOffset = view.now - Date.now();
+    clockOffset = TempCheck.clockOffset(view);
     render();
   };
 
@@ -67,7 +66,7 @@ function connect() {
 // ---------- rendering ----------
 
 function render() {
-  const key = `${view.phase}:${view.round?.index ?? "-"}:${view.thinking}`;
+  const key = TempCheck.screenKey(view);
   if (key !== stageKey) {
     stageKey = key;
     stage.replaceChildren();
@@ -78,18 +77,15 @@ function render() {
 }
 
 function buildStage() {
-  switch (view.phase) {
-    case "lobby":
-      return buildLobby();
-    case "intro":
-      return buildIntro();
-    case "input":
-      return buildInput();
-    case "reveal":
-      return view.thinking ? buildThinking() : buildReveal();
-    default:
-      return buildStandings();
-  }
+  const screens = {
+    lobby: buildLobby,
+    intro: buildIntro,
+    input: buildInput,
+    thinking: buildThinking,
+    reveal: buildReveal,
+    standings: buildStandings,
+  };
+  screens[TempCheck.screenName(view)]();
 }
 
 // Fills in everything that changes while a screen is showing.
@@ -121,7 +117,7 @@ function setTemperature(temperature) {
 // Runs ten times a second to keep the countdown smooth.
 function tick() {
   if (!view || view.phase !== "input" || !refs.countdown) return;
-  const seconds = Math.max(0, (view.endsAt - (Date.now() + clockOffset)) / 1000);
+  const seconds = TempCheck.secondsLeft(view, clockOffset);
   refs.countdown.textContent = Math.ceil(seconds);
   refs.bar.style.width = `${(seconds / view.inputSeconds) * 100}%`;
 
@@ -132,16 +128,6 @@ function tick() {
 }
 
 // ---------- pieces ----------
-
-// The sentence, with the blank drawn as a gap.
-function stemElement(stem) {
-  const paragraph = MM.el("p", "stem");
-  stem.split("___").forEach((part, index) => {
-    if (index > 0) paragraph.append(MM.el("span", "stem__blank", " "));
-    paragraph.append(part);
-  });
-  return paragraph;
-}
 
 function modeBadge(round) {
   return MM.el("p", `mode mode--${round.mode}`, MODE_TITLES[round.mode]);

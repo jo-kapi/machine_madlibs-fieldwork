@@ -131,7 +131,7 @@ body.host {
   border-radius: var(--radius-pill);
   font-family: var(--font-mono);
   font-size: 1.2rem;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 
   &.mode--match {
@@ -509,7 +509,7 @@ body.host {
 }
 
 /* SYSTEM PROMPT SHEET
-   The shared peek sheet (see peek.css), with a larger type scale because it is read from
+   The shared peek sheet (see overlays.css), with a larger type scale because it is read from
    across the room. */
 .host .peek {
   --text-sm: 1.1rem;

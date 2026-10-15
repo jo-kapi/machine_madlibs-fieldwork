@@ -23,16 +23,24 @@ Needs Node 20.12 or newer and a running Ollama with the models named by `MODEL`
 ## Where things live
 
 ```
-server/            Node server (ES modules). Start reading at index.js, then app.js
+server/            Node server (ES modules). Start reading at index.js, then routes.js
+  index.js           Start-up: checks Ollama, warms the models, prints the addresses
+  routes.js          The Express app and every route (activities, Temp Check, host)
+  config.js          Settings from the environment, and the folders served
   prompts.js         Every system prompt and sampling option. Edit prompts here.
   activities.js      Activities 1 and 2: build the request, call the model, tidy the reply
-  game.js            The Temp Check game (phases, scoring, what each screen is sent)
-  scoring.js         Pure scoring maths
   ollama.js          The only code that talks to Ollama, behind a concurrency limiter
-  game-routes.js     Temp Check and host routes (host routes are localhost-only)
+  game.js            The Temp Check game: phases and what each screen is sent
+  game-rules.js      Temp Check words, scoring, the schedule of rounds, sampling
+  people.js          Who is in the room and the poems they sent (memory only)
+  web.js             HTTP helpers: errors, the host-only guard, event streams, addresses
 public/            What participants load (plain HTML, CSS and browser JavaScript)
-  css/tokens.css     Every colour, font and size. Re-theme here.
+  css/tokens.css     Every color, font and size. Re-theme here.
+  css/base.css       Page shell, buttons, form controls and the Craziness slider
+  css/overlays.css   Dialogs and the peek sheet
   data/              Wild cards, instruction cards, Temp Check stems and rounds: content, not code
+  js/common.js       Helpers every page shares, on the MM object
+  js/temp-check.js   What the Temp Check player and host screens share
 host/              The projector screen and gallery; served only to the host machine
 ```
 
@@ -44,7 +52,7 @@ global mode; shared helpers live on the `MM` object in `public/js/common.js`. Ad
 dependency only when the project truly needs one.
 
 **CSS.** Vanilla CSS with native nesting. Name components with BEM where it helps
-(`.block__element--modifier`). Take colours, fonts and sizes from `tokens.css`; don't
+(`.block__element--modifier`). Take colors, fonts and sizes from `tokens.css`; don't
 hard-code them. Layouts target small tablets (about 768px wide) and up; there is no
 phone-specific layout.
 
@@ -86,7 +94,7 @@ These are the privacy and safety promises the README makes to participants.
   They are read when used, so no restart is needed.
 - **Change the look:** edit `public/css/tokens.css`.
 - **Add an activity:** add a page in `public/`, add its prompts to `prompts.js`, add a
-  function in `server/activities.js` and a route in `server/api.js`, then add a nav link
+  function in `server/activities.js` and a route in `server/routes.js`, then add a nav link
   and a peek button (`class="peek__trigger" data-peek="..."`) on the page, with a note for
   each prompt in `public/data/peek.json`.
 - **Add or change a setting:** add it to `server/config.js` with a default, then to
@@ -109,10 +117,10 @@ These are the privacy and safety promises the README makes to participants.
   temperature 1.3. The slider's wild end therefore widens both, but stops short.
 - Temp Check uses its own model (`TEMP_MODEL`), because instruction-tuned models differ
   hugely in how much their answers spread out as temperature rises. Some barely change.
-- At high temperature models glue junk onto words. `looksLikeWord` in `server/words.js`
+- At high temperature models glue junk onto words. `looksLikeWord` in `server/game-rules.js`
   filters machine replies; it only catches the obvious cases, by design.
-- Temp Check compares whole words, never tokens. Always normalise with
-  `server/words.js` before comparing.
+- Temp Check compares whole words, never tokens. Always normalize with
+  `normalizeWord` in `server/game-rules.js` before comparing.
 - p5.js 2.x delivers touch input through `mousePressed`, `mouseDragged` and
   `mouseReleased`. There are no `touchStarted` handlers.
 - Temp Check state lives in `server/game.js`. Pages only display it, which is why

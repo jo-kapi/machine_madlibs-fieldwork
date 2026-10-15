@@ -10,9 +10,15 @@
 //   ended        final standings
 //
 // The host drives the phases. Players only answer (and, in the finale, vote).
-import { InputError } from "./errors.js";
-import { normaliseWord, tally } from "./words.js";
-import { scoreMatch, beatOutcome, temperatureFromVotes, VOTE_RANGE } from "./scoring.js";
+import { InputError } from "./web.js";
+import {
+  normalizeWord,
+  tally,
+  scoreMatch,
+  beatOutcome,
+  temperatureFromVotes,
+  VOTE_RANGE,
+} from "./game-rules.js";
 
 const MAX_WORD_LENGTH = 30;
 const LEADERBOARD_SIZE = 8;
@@ -92,10 +98,10 @@ export class Game {
   }
 
   // Records a player's word for the current round. The last word before the
-  // input phase ends is the one that counts. Returns the normalised word.
+  // input phase ends is the one that counts. Returns the normalized word.
   answer(id, text) {
     if (this.phase !== "input") throw new InputError("Time's up.", 409);
-    const word = normaliseWord(text);
+    const word = normalizeWord(text);
     if (!word) throw new InputError("Type a word.");
     if (word.length > MAX_WORD_LENGTH) throw new InputError("That word is too long.");
 
@@ -122,7 +128,7 @@ export class Game {
     this.emitSoon();
   }
 
-  // Only people who have voted count towards the average.
+  // Only people who have voted count toward the average.
   crowdTemperature() {
     return temperatureFromVotes([...this.votes.values()], {
       max: this.schedule.maxTemperature,

@@ -66,6 +66,7 @@
   --font-mono: "ABC Areal Mono", ui-monospace, monospace;
   --font-serif: Georgia, serif;
   --font-size-base: 14px; /* 1rem everywhere */
+  --tracking-label: 0.06em; /* letter spacing of small uppercase mono labels */
 
   /* Type scale (in rem, so it follows --font-size-base) */
   --text-sm: 0.85rem;

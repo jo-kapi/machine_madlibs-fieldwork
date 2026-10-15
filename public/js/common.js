@@ -142,7 +142,7 @@ const MM = (() => {
 
   // ---------- waiting ----------
 
-  // Three dots that bounce in turn (the .dots styles are in buttons.css). Pass a label
+  // Three dots that bounce in turn (the .dots styles are in base.css). Pass a label
   // when the dots stand alone, so screen readers can say what is going on.
   function dots(label) {
     const element = el("span", "dots");

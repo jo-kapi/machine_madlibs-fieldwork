@@ -1,17 +1,17 @@
-// Host screen for Temp Check. It shows whatever the server's game is doing and
-// sends the host's commands back. Nothing here keeps game state, so reloading
-// the page picks up exactly where the game is.
+// Host screen for Temp Check. It shows whatever the server's game is doing and sends
+// the host's commands back. Nothing here keeps game state, so reloading the page picks
+// up exactly where the game is.
+const { MODE_TITLES, stemElement } = TempCheck;
+
 const stage = document.querySelector(".host__stage");
 const roundLabel = document.querySelector(".host__round");
 
 let view = null; // the latest state from the server
-let clockOffset = 0; // server time minus this computer's clock, in ms
+let clockOffset = 0; // see TempCheck.clockOffset
 let stageKey = ""; // which screen is currently built
 let refs = {}; // elements that are updated in place
 let joinInfo = null; // the addresses people type in to join
 let currentView = "game"; // "game" or "gallery"
-
-const MODE_TITLES = { match: "Be the machine", beat: "Beat the machine" };
 
 // The dial's artwork is fixed markup (no user text), so it is safe to insert as HTML.
 const DIAL_SVG = `
@@ -37,7 +37,7 @@ function init() {
   const source = new EventSource("/api/host/events");
   source.onmessage = (event) => {
     view = JSON.parse(event.data);
-    clockOffset = view.now - Date.now();
+    clockOffset = TempCheck.clockOffset(view);
     render();
   };
   source.onerror = () =>
@@ -156,7 +156,7 @@ function toggleFullscreen() {
 // ---------- rendering ----------
 
 function render() {
-  const key = `${view.phase}:${view.round?.index ?? "-"}:${view.thinking}`;
+  const key = TempCheck.screenKey(view);
   if (key !== stageKey) {
     stageKey = key;
     stage.replaceChildren();
@@ -167,18 +167,15 @@ function render() {
 }
 
 function buildStage() {
-  switch (view.phase) {
-    case "lobby":
-      return buildLobby();
-    case "intro":
-      return buildIntro();
-    case "input":
-      return buildInput();
-    case "reveal":
-      return view.thinking ? buildThinking() : buildReveal();
-    default:
-      return buildStandings();
-  }
+  const screens = {
+    lobby: buildLobby,
+    intro: buildIntro,
+    input: buildInput,
+    thinking: buildThinking,
+    reveal: buildReveal,
+    standings: buildStandings,
+  };
+  screens[TempCheck.screenName(view)]();
 }
 
 // Updates everything that changes while a screen is showing.
@@ -201,21 +198,12 @@ function updateStage() {
 // Runs ten times a second to keep the countdown smooth.
 function tick() {
   if (!view || view.phase !== "input" || !refs.timer) return;
-  const seconds = Math.max(0, (view.endsAt - (Date.now() + clockOffset)) / 1000);
+  const seconds = TempCheck.secondsLeft(view, clockOffset);
   refs.timer.textContent = Math.ceil(seconds);
   refs.bar.style.width = `${(seconds / view.inputSeconds) * 100}%`;
 }
 
 // ---------- pieces ----------
-
-function stemElement(stem, className = "stem") {
-  const paragraph = MM.el("p", className);
-  stem.split("___").forEach((part, index) => {
-    if (index > 0) paragraph.append(MM.el("span", "stem__blank", " "));
-    paragraph.append(part);
-  });
-  return paragraph;
-}
 
 function modeLabel(round) {
   const label = round.crowd

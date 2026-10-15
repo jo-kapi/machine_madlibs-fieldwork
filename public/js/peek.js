@@ -38,7 +38,7 @@ const Peek = (() => {
     titleElement = MM.el("h2", "peek__title");
     titleElement.id = "peek-title";
     const heading = MM.el("div");
-    heading.append(MM.el("p", "peek__eyebrow", "Under the hood"), titleElement);
+    heading.append(MM.el("p", "label peek__eyebrow", "Under the hood"), titleElement);
 
     const close = MM.el("button", "btn btn--close", "×");
     close.type = "button";
@@ -129,7 +129,7 @@ const Peek = (() => {
   // The model, and any values that change while the app runs.
   function metaRow(replies) {
     const row = MM.el("div", "peek__meta");
-    row.append(MM.el("span", "peek__meta-label", "Model"));
+    row.append(MM.el("span", "label", "Model"));
     for (const model of new Set(replies.map((reply) => reply.model))) {
       row.append(MM.el("span", "peek__tag", model));
     }
@@ -170,7 +170,7 @@ const Peek = (() => {
   // A smaller block under a prompt: a label, a line of explanation, then the text.
   function extraBlock(label, hint, text) {
     const block = MM.el("div", "peek__extra");
-    block.append(MM.el("h4", "peek__sublabel", label));
+    block.append(MM.el("h4", "label", label));
     if (hint) block.append(MM.el("p", "peek__hint", hint));
     block.append(MM.el("pre", "peek__text", text));
     return block;
@@ -181,7 +181,7 @@ const Peek = (() => {
   // changes the settings.
   function settingsBlock(options, hints, sliderNote) {
     const block = MM.el("div", "peek__extra");
-    block.append(MM.el("h4", "peek__sublabel", "Settings"));
+    block.append(MM.el("h4", "label", "Settings"));
 
     const list = MM.el("dl", "peek__settings");
     for (const [name, value] of Object.entries(options)) {

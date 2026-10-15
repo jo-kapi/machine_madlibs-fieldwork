@@ -1,13 +1,28 @@
 // One function per activity: build the request, call the model, clean the reply.
 // Replies are parsed here so the browser only ever receives tidy data.
+import fs from "node:fs/promises";
+import path from "node:path";
 import { PROMPTS, CRAZINESS } from "./prompts.js";
 import { chat, OllamaError } from "./ollama.js";
-import { InputError } from "./errors.js";
-import { findCard } from "./wildcards.js";
+import { InputError } from "./web.js";
+import { publicDir } from "./config.js";
 
 const MAX_STORY_PARTS = 100;
 const MAX_STORY_CHARS = 4000;
 const MAX_SHORT_INPUT = 100;
+
+// Wild cards live in public/data/wildcards.json: an id and five words or phrases each.
+// The file is read on every use, so edits apply immediately.
+const CARDS_FILE = path.join(publicDir, "data", "wildcards.json");
+
+export async function findCard(id) {
+  try {
+    const cards = JSON.parse(await fs.readFile(CARDS_FILE, "utf8"));
+    return cards.find((card) => card.id === id) ?? null;
+  } catch {
+    return null;
+  }
+}
 
 function shortText(value, label) {
   if (typeof value !== "string") throw new InputError(`${label} must be text.`);

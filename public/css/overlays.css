@@ -1,3 +1,196 @@
+/* OVERLAYS
+   Layers that open on top of the page: the instructions and confirmation cards, and the
+   peek sheet. All are native <dialog> elements. */
+
+/* DIALOGS
+   Shared by the instructions card (.help), the confirmation card (.confirm) and the peek
+   sheet (further down). They are native <dialog> elements, so the page behind is inert
+   and Esc closes them. */
+
+/* THE SCRIM
+   Every dialog dims the page behind it with a scrim in the page's own color, so it
+   follows the light or dark setting. The values are written out because older browsers
+   don't pass custom properties (the tokens) on to ::backdrop: keep them in step with
+   --color-bg in tokens.css. */
+dialog::backdrop {
+  background: rgb(255 255 255 / 0.7);
+
+  @media (prefers-color-scheme: dark) {
+    background: rgb(18 18 18 / 0.7);
+  }
+}
+
+/* A dialog takes focus itself when it opens (see MM.openDialog), so no button inside it
+   shows a focus ring before anyone has pressed a key. */
+dialog:focus-visible {
+  outline: none;
+}
+
+/* The scrim fades in, and out again when the script adds .dialog--closing (see
+   MM.closeDialog in common.js). */
+@media (prefers-reduced-motion: no-preference) {
+  dialog[open]::backdrop {
+    animation: scrim-in 250ms ease-out;
+  }
+
+  dialog.dialog--closing::backdrop {
+    animation: scrim-out 200ms ease-in forwards;
+  }
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes scrim-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* THE CARDS
+   The instructions card (.help) and the confirmation card (.confirm) are the same kind
+   of dialog. Padding sits on the inner element, so only clicks on the dimmed backdrop
+   count as clicks on the dialog itself. */
+.help,
+.confirm {
+  width: 100%;
+  padding: 0;
+  border: solid thin var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.2);
+
+  /* Rises a little as it fades in, in step with the scrim. */
+  @media (prefers-reduced-motion: no-preference) {
+    &[open] {
+      animation: card-in 250ms var(--ease-out);
+    }
+
+    &.dialog--closing {
+      animation: card-out 200ms ease-in forwards;
+    }
+  }
+}
+
+.help {
+  max-width: min(36rem, calc(100vw - 2rem));
+}
+
+.confirm {
+  max-width: min(26rem, calc(100vw - 2rem));
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}
+
+@keyframes card-out {
+  to {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}
+
+.help__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+
+  & p,
+  & h2 {
+    margin: 0;
+  }
+
+  /* The "Got it" button: a primary button across the full width of the card, a little
+     taller than usual, like the buttons on the confirmation card. */
+  & .help__close {
+    align-self: stretch;
+    min-height: 2.6rem;
+    margin-top: var(--space-sm);
+    font-weight: 500;
+  }
+}
+
+.help__title,
+.confirm__title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.help__intro {
+  color: var(--color-text-soft);
+  line-height: var(--leading-prose);
+}
+
+.help__steps {
+  margin: var(--space-sm) 0;
+  padding-left: 2em;
+  list-style: decimal;
+  line-height: var(--leading-prose);
+
+  & li {
+    padding-left: 0.25em;
+  }
+
+  & li + li {
+    margin-top: 0.9em;
+  }
+
+  & li::marker {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+  }
+}
+
+/* An optional closing tip. */
+.help__note {
+  padding: 0.9em 1.1em;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  line-height: 1.5;
+}
+
+/* THE CONFIRMATION CARD
+   A styled replacement for the browser's confirm(), made by MM.confirm in common.js. */
+.confirm__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+
+  & h2,
+  & p {
+    margin: 0;
+  }
+}
+
+.confirm__message {
+  color: var(--color-text-soft);
+  line-height: var(--leading-prose);
+}
+
+/* Two equal buttons that span the text above, so both edges line up with it. */
+.confirm__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+
+  & .btn {
+    min-height: 2.6rem;
+  }
+}
+
 /* PEEK SHEET
    "Peek at the system prompt": a trigger button in the toolbar, and a sheet that slides
    in from the right edge. The sheet is built by js/peek.js. */
@@ -26,7 +219,7 @@
 /* THE SHEET
    A native <dialog>, so the page behind is inert and Esc closes it. It opens from the left
    edge, on the same side as the button that opens it, with square corners. The dimmed
-   backdrop, and its fade, are shared with the other dialogs (see layout.css). */
+   backdrop, and its fade, are shared with the other dialogs (see THE SCRIM above). */
 .peek {
   position: fixed;
   inset: 0 auto 0 0;
@@ -92,13 +285,9 @@
   }
 }
 
+/* Also a .label (see the form styles). */
 .peek__eyebrow {
-  margin: 0 0 var(--space-xs);
-  color: var(--color-text-muted);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  margin-bottom: var(--space-xs);
 }
 
 .peek__title {
@@ -154,14 +343,6 @@
   gap: var(--space-sm);
 }
 
-.peek__meta-label {
-  color: var(--color-text-muted);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 .peek__tag {
   padding: 0.2em 0.75em;
   border: solid thin var(--color-border);
@@ -215,16 +396,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-}
-
-.peek__sublabel {
-  margin: 0;
-  color: var(--color-text-muted);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 /* The settings: a chip with the name and value, and a plain-language note beside it. */

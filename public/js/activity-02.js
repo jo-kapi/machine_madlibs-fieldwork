@@ -1,4 +1,4 @@
-// DOM Elements
+// DOM elements
 let saveButton,
   sendButton,
   keywordForm,
@@ -11,14 +11,12 @@ let saveButton,
   sizeButtons,
   fontButtons;
 
-// Initialize the app
 function init() {
   // First-time visitors are sent to the join page.
   if (!MM.requireIdentity()) return;
   Peek.init();
   Instructions.init("activity-02");
 
-  // Cache DOM elements
   saveButton = document.querySelector(".toolbar__download");
   sendButton = document.querySelector(".toolbar__send");
   keywordForm = document.querySelector("#form-keywords");
@@ -31,18 +29,14 @@ function init() {
   sizeButtons = Array.from(document.querySelectorAll("[data-size]"));
   fontButtons = Array.from(document.querySelectorAll("[data-font]"));
 
-  // Set up event listeners
   setupEventListeners();
   updateCanvasHint();
 }
 
-// Set up all event listeners
 function setupEventListeners() {
-  // Download button
   saveButton.addEventListener("click", downloadImage);
   sendButton.addEventListener("click", sendToScreen);
 
-  // Form submissions
   keywordForm.addEventListener("submit", handleKeywordSubmit);
   canvasBgForm.addEventListener("submit", handleCanvasBgSubmit);
   textColorForm.addEventListener("submit", handleTextColorSubmit);
@@ -86,7 +80,6 @@ function requireActiveTile() {
   return tile;
 }
 
-// Handle keyword form submission
 async function handleKeywordSubmit(event) {
   event.preventDefault();
   const keywordInput = document.querySelector("#input-keyword");
@@ -103,7 +96,6 @@ async function handleKeywordSubmit(event) {
   });
 }
 
-// Handle canvas background form submission
 async function handleCanvasBgSubmit(event) {
   event.preventDefault();
   const bgColorInput = document.querySelector("#canvas-bg");
@@ -116,7 +108,6 @@ async function handleCanvasBgSubmit(event) {
   });
 }
 
-// Handle text color form submission
 async function handleTextColorSubmit(event) {
   event.preventDefault();
   const textColorInput = document.querySelector("#text-fg");
@@ -131,7 +122,6 @@ async function handleTextColorSubmit(event) {
   });
 }
 
-// Handle text background form submission
 async function handleTextBgSubmit(event) {
   event.preventDefault();
   const textBgInput = document.querySelector("#text-bg");
@@ -145,7 +135,6 @@ async function handleTextBgSubmit(event) {
   });
 }
 
-// Handle size button clicks
 function handleSizeClick(event) {
   const tile = requireActiveTile();
   if (!tile) return;
@@ -154,7 +143,6 @@ function handleSizeClick(event) {
   showChoice(sizeButtons, "size", tile.sz);
 }
 
-// Handle font button clicks
 function handleFontClick(event) {
   const tile = requireActiveTile();
   if (!tile) return;
@@ -164,7 +152,7 @@ function handleFontClick(event) {
 }
 
 // Marks the button whose data attribute matches the value as pressed, and slides the
-// pill behind it (see .segmented in forms.css). A value of null leaves none pressed.
+// pill behind it (see .segmented in base.css). A value of null leaves none pressed.
 function showChoice(buttons, attribute, value) {
   const group = buttons[0].parentElement;
   const index = buttons.findIndex(
@@ -225,9 +213,7 @@ function showColor(input, color) {
   showSwatch(input, color);
 }
 
-// Validate hex color format
 function isValidHexColor(color) {
-  // Check if it starts with # and has valid hex format
   const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
   return hexRegex.test(color);
 }
@@ -240,13 +226,11 @@ async function resolveColor(text) {
   return hex;
 }
 
-// Append words to the word palette
 function appendWords(wordsArray) {
   const wordsContainer = document.querySelector(".words");
 
   wordsArray.forEach((word) => {
     if (word.trim()) {
-      // Only add non-empty words
       const wordElement = createWordElement(word);
       wordsContainer.appendChild(wordElement);
     }
@@ -254,7 +238,6 @@ function appendWords(wordsArray) {
   updateCanvasHint();
 }
 
-// Create a word element
 function createWordElement(word) {
   const wordElement = document.createElement("button");
   wordElement.type = "button";
@@ -284,7 +267,7 @@ function toggleWord(event) {
     bg: "#000",
     c: "#fff",
     sz: 16,
-    font: "sans-serif", // Default font
+    font: "sans-serif",
   };
   placeTile(newTile);
   wordTiles.push(newTile);
@@ -342,7 +325,6 @@ function updateCanvasHint() {
   canvasHint.hidden = wordTiles.length > 0;
 }
 
-// Update editor interface with selected tile properties
 function updateEditor(tile) {
   showColor(document.querySelector("#text-fg"), tile.c);
   showColor(document.querySelector("#text-bg"), tile.bg);
@@ -351,7 +333,6 @@ function updateEditor(tile) {
   editor.classList.remove("editor--idle");
 }
 
-// Clear editor selection
 function clearEditor() {
   showColor(document.querySelector("#text-fg"), null);
   showColor(document.querySelector("#text-bg"), null);
@@ -360,7 +341,6 @@ function clearEditor() {
   editor.classList.add("editor--idle");
 }
 
-// Download canvas as image
 function downloadImage() {
   // Without the selection outline, which would be saved into the image.
   canvasWithoutSelection();
@@ -416,5 +396,4 @@ async function sendToScreen() {
   }
 }
 
-// Start the app when DOM is ready
 document.addEventListener("DOMContentLoaded", init);

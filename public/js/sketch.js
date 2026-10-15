@@ -1,4 +1,4 @@
-// Global variables for p5.js canvas
+// State shared with the page script (activity-02.js)
 const wordTiles = [];
 let activeTileIndex = null;
 let sketchBg;
@@ -20,7 +20,6 @@ function canvasSize() {
   return Math.floor(Math.min(parent.clientWidth, parent.clientHeight));
 }
 
-// p5.js setup function
 function setup() {
   const parentElement = document.querySelector(".preview");
   const canvasSizeValue = canvasSize();
@@ -91,7 +90,6 @@ function placeTile(tile) {
   }
 }
 
-// p5.js draw function
 function draw() {
   background(sketchBg);
   textAlign(CENTER, CENTER);
@@ -100,7 +98,6 @@ function draw() {
     const tile = wordTiles[i];
     measureTile(tile);
 
-    // Draw tile background
     fill(tile.bg);
     if (i === activeTileIndex) {
       stroke(selectionColor);
@@ -110,7 +107,6 @@ function draw() {
     }
     rect(tile.x, tile.y, tile.w, tile.h);
 
-    // Draw text
     fill(tile.c);
     noStroke();
     text(tile.text, tile.x + tile.w / 2, tile.y + tile.h / 2);
@@ -131,12 +127,11 @@ function canvasWithoutSelection() {
 // Selects the top-most tile at (x, y) and starts dragging it.
 // Returns true if a tile was hit.
 function pressAt(x, y) {
-  // Check if the pointer is within canvas bounds
   if (x < 0 || x > width || y < 0 || y > height) {
     return false;
   }
 
-  // Start from the top-most tile and check if the pointer is within bounds
+  // The top-most tile is last in the list, so look from the end.
   for (let i = wordTiles.length - 1; i >= 0; i--) {
     const tile = wordTiles[i];
     if (x > tile.x && x < tile.x + tile.w && y > tile.y && y < tile.y + tile.h) {
@@ -145,13 +140,11 @@ function pressAt(x, y) {
       // Calculate offset for smooth dragging
       offsetX = x - tile.x;
       offsetY = y - tile.y;
-      // Update editor with current tile properties
       updateEditor(wordTiles[activeTileIndex]);
       return true;
     }
   }
 
-  // If no tile was hit, clear selection
   activeTileIndex = null;
   clearEditor();
   return false;

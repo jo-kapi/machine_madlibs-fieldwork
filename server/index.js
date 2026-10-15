@@ -1,9 +1,10 @@
+// Starts the server: checks Ollama, warms up the models and prints the addresses.
 import { config, modelsInUse } from "./config.js";
-import { createApp } from "./app.js";
-import { getJoinUrls } from "./network.js";
+import { createApp } from "./routes.js";
+import { getJoinUrls } from "./web.js";
 import { listModels, hasModel, rawChat } from "./ollama.js";
 
-// Reports whether Ollama and each model are ready. Returns the models that are.
+// Reports whether Ollama and each model are ready, and returns the models that are.
 async function printOllamaStatus() {
   const installed = await listModels();
   if (installed === null) {
@@ -25,8 +26,8 @@ async function printOllamaStatus() {
   return ready;
 }
 
-// The first request to a model loads it into memory, which can take several
-// seconds. Doing that now means the first participants don't wait for it.
+// The first request to a model loads it into memory, which takes seconds. Doing it now
+// means the first participants don't wait.
 async function warmUp(models) {
   if (models.length === 0) return;
   console.log("\nWarming up the models…");

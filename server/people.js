@@ -1,7 +1,54 @@
-// Visual Poetry images that participants send to the shared screen.
-// They live in memory only and are forgotten when the server stops.
+// Who is in the room and what they have sent, held in memory only. Nothing is written
+// to disk, and everything is forgotten when the server stops.
 import { randomBytes } from "node:crypto";
-import { InputError } from "./errors.js";
+import { InputError } from "./web.js";
+
+// ---------- sessions ----------
+// Pages re-join on load, so a restarted server picks people back up.
+
+const MAX_SESSIONS = 1000;
+const ID_PATTERN = /^[a-f0-9]{32}$/;
+const sessions = new Map();
+
+// Removes control characters and extra spaces, and limits the length.
+function clean(value, max) {
+  return String(value ?? "")
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, max);
+}
+
+// Creates a session, or updates the one with the same id.
+export function join({ id, name, pronouns } = {}) {
+  const cleanName = clean(name, 40);
+  if (!cleanName) throw new InputError("Please enter your name.");
+
+  const sessionId = ID_PATTERN.test(id ?? "") ? id : randomBytes(16).toString("hex");
+  if (!sessions.has(sessionId) && sessions.size >= MAX_SESSIONS) {
+    throw new InputError("The room is full.", 503);
+  }
+
+  const session = { id: sessionId, name: cleanName, pronouns: clean(pronouns, 30) };
+  sessions.set(sessionId, session);
+  return session;
+}
+
+export function getSession(id) {
+  return sessions.get(id) ?? null;
+}
+
+export function sessionCount() {
+  return sessions.size;
+}
+
+// For tests.
+export function clearSessions() {
+  sessions.clear();
+}
+
+// ---------- gallery ----------
+// Visual Poetry images that participants send to the shared screen.
 
 export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 200 * 1024 * 1024;
@@ -53,7 +100,7 @@ export class Gallery {
     return item.id;
   }
 
-  // Details for the host's grid. The image bytes are fetched separately.
+  // What the host's grid needs. The image bytes are fetched separately.
   list() {
     return this.items.map(({ id, name, pronouns, at }) => ({ id, name, pronouns, at }));
   }

@@ -140,7 +140,7 @@ Temp Check runs about twelve rounds, ending with a finale where everyone's Hot a
 | Temp Check rounds, temperatures, timer and scoring mode | `public/data/rounds.json`                                                                                          |
 | How far the Craziness slider can push the machine       | `CRAZINESS` in `server/prompts.js`                                                                                 |
 | What the machine is told                                | `server/prompts.js`                                                                                                |
-| Colours and fonts                                       | `public/css/tokens.css` (the font files are in `public/css/fonts/`)                                                |
+| Colors and fonts                                        | `public/css/tokens.css` (the font files are in `public/css/fonts/`)                                                |
 
 The data files are read each time a game starts or a card is drawn, so you don't need to restart the server. Restart the game from the host page to pick up changes to the rounds or stems.
 
@@ -160,7 +160,7 @@ Settings go in a file named `.env` in the project folder. Copy `.env.example` to
 | Setting              | Default                  | What it does                                                                                                                                                                                     |
 | -------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `PORT`               | `3000`                   | Port the app listens on.                                                                                                                                                                         |
-| `MODEL`              | `mistral-small:24b`      | The Ollama model for Activities 01 and 02 (writing, poetry, colours). Run `ollama pull <model>` first.                                                                                           |
+| `MODEL`              | `mistral-small:24b`      | The Ollama model for Activities 01 and 02 (writing, poetry, colors). Run `ollama pull <model>` first.                                                                                            |
 | `TEMP_MODEL`         | `llama3.2`               | The Ollama model for Activity 03. It's separate because Temp Check needs a model whose answers visibly spread out as temperature rises. Set it equal to `MODEL` to use one model for everything. |
 | `OLLAMA_URL`         | `http://127.0.0.1:11434` | Where Ollama is listening.                                                                                                                                                                       |
 | `PUBLIC_URL`         | detected                 | The address shown to participants instead of the detected one, for example `http://192.168.100.100:3000`.                                                                                        |
@@ -186,7 +186,9 @@ public/            Pages for participants
   data/              Wild cards, Temp Check stems and rounds
 host/              The host screen and gallery (served to the host computer only)
 server/            The Node server
+  routes.js          Every route the pages call
   prompts.js         The system prompts and settings the machine is given
+  activities.js      Activities 1 and 2: build the request, call the model, tidy the reply
   game.js            The Temp Check game
 ```
 
@@ -199,7 +201,7 @@ Handy commands:
 
 ## Contributing
 
-Issues and pull requests are welcome. [`AGENTS.md`](AGENTS.md) describes how the code is organised and the conventions it follows, for people and AI coding assistants alike.
+Issues and pull requests are welcome. [`AGENTS.md`](AGENTS.md) describes how the code is organized and the conventions it follows, for people and AI coding assistants alike.
 
 ## License
 
