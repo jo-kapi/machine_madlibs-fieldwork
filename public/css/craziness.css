@@ -35,10 +35,10 @@
   background-color: transparent;
   background-image: repeating-linear-gradient(
     to right,
-    var(--color-border-strong) 0 1px,
+    color-mix(in srgb, var(--color-border-strong) 75%, transparent) 0 1px,
     transparent 1px calc(var(--travel) / var(--steps))
   );
-  background-size: calc(var(--travel) + 1px) 0.5rem;
+  background-size: calc(var(--travel) + 1px) 0.35rem;
   background-position: center;
   background-repeat: no-repeat;
 
