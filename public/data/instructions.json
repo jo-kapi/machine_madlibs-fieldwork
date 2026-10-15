@@ -6,6 +6,8 @@
       "The machine writes the first line. After that, take turns, one line at a time: yours, then the machine’s.",
       "Add your creative twist. Use your turn to shift or disrupt the story: derail the plot, contradict the machine, or throw in something sudden.",
       "Use your wild words. Draw a wild card and include at least one of its words or phrases in your story. The machine will work in a different one.",
+      "Turn up the craziness. Slide toward wild and the machine takes bigger risks; toward steady, it plays it safe.",
+      "Write in your language. Use any language the machine knows and it will answer in the same one.",
       "There are no edits. Once a line is written, it’s permanent.",
       "The story ends at {maxWords} words. Download it, or press New story to try again."
     ],
@@ -16,6 +18,7 @@
     "intro": "Move from storytelling to text arrangement. Build compositions from machine-generated words that are as much about rhythm and layout as they are about language. Don’t aim for a finished poem. Stay curious and see what the arrangement says.",
     "steps": [
       "Start with a phrase. A feeling, an object, a question, or something from earlier. Generate again for more; they pile up.",
+      "Set the craziness. Toward wild, the words stray further from your theme; toward steady, they stay close. Write your theme in any language and the words come back in it.",
       "Place your words. Click one to put it on the canvas and drag it around. Click it again, or press Remove, to take it off.",
       "Let the layout do the talking. Scale, color, space, and placement are your expressive tools. Select a word to change them.",
       "Describe your colors. Tap the dot to pick one, type a hex code, or say it in words (“burnt orange”) and the machine will choose.",
