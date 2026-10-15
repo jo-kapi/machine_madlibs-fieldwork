@@ -4,7 +4,7 @@ Workshop activities for **Poetry in Computation (Exploration Lab #2)**, organize
 
 Everything runs on one computer. The language model runs locally through [Ollama](https://ollama.com), so nothing is sent to the internet. Other people join from their own phones, tablets and laptops over Wi-Fi, without installing anything.
 
-> **About this repository.** It's a record of the workshop, kept online for the people who took part and for anyone who wants to run or adapt it. It isn't actively developed, so issues and pull requests may go unanswered. Forks are welcome (see [License](#license)).
+> **About this repository.** This workshop was made for and run as part of **field:work**, which is why its pages carry the field:work name. The repository is a record of it, kept online for the people who took part and for anyone who wants to run or adapt it. It isn't actively developed, so issues and pull requests may go unanswered. Forks are welcome (see [License](#license)).
 
 **Contents:** [The activities](#the-activities) · [Quick start](#quick-start-run-it-yourself) · [Facilitator guide](#facilitator-guide) · [Settings](#settings) · [How it works](#how-it-works) · [License](#license) · [Credits](#credits)
 
@@ -216,4 +216,5 @@ Handy commands:
 - Created by [Kapilan Naidu](https://github.com/kapilan-naidu).
 - Made for **Poetry in Computation (Exploration Lab #2)**, organized by _jo+kapi_ as part of **_field:work_**.
 - Built with [Ollama](https://ollama.com), [Express](https://expressjs.com) and [p5.js](https://p5js.org).
-- Bundled third-party files: p5.js 2.3.4 (`public/js/p5.min.js`, LGPL-2.1) and [normalize.css](https://github.com/necolas/normalize.css) 8.0.1 (`public/css/normalize.css`, MIT). The typefaces are described in [`public/css/fonts/README.md`](public/css/fonts/README.md).
+- Typefaces: ABC Areal and ABC Areal Mono, by Dinamo Typefaces (see [`public/css/fonts/README.md`](public/css/fonts/README.md)).
+- Bundled third-party files: p5.js 2.3.4 (`public/js/p5.min.js`, LGPL-2.1) and [normalize.css](https://github.com/necolas/normalize.css) 8.0.1 (`public/css/normalize.css`, MIT).

@@ -63,9 +63,11 @@ dependency only when the project truly needs one.
 hard-code them. Layouts target small tablets (about 768px wide) and up; there is no
 phone-specific layout.
 
-**Formatting.** Prettier, configured in `.prettierrc` (90 columns, 2 spaces, double
-quotes, semicolons). Run `npx prettier --write <the files you changed>`. Never format
-`public/js/p5.min.js` or `normalize.css` (both are in `.prettierignore`).
+**Formatting.** Prettier with 90 columns, 2 spaces, double quotes, semicolons and ES5
+trailing commas. The maintainer's Prettier config isn't committed, so pass the two
+options that differ from Prettier's defaults:
+`npx prettier --print-width 90 --trailing-comma es5 --write <the files you changed>`.
+Never format `public/js/p5.min.js`, `normalize.css` or the font files.
 
 **Comments.** Short, in plain language, saying _why_ rather than restating the code.
 Write them as public documentation: no working notes, no references to conversations.

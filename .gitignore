@@ -149,6 +149,10 @@ CLAUDE.local.md
 .gemini/
 GEMINI.md
 
+# Maintainer's formatter settings (the options are written out in AGENTS.md).
+.prettierrc
+.prettierignore
+
 # Scratch space
 scratch/
 tmp/

@@ -1,6 +1,6 @@
 # Brand fonts
 
-The field:work typefaces, as variable fonts:
+The field:work typefaces, by Dinamo Typefaces, as variable fonts:
 
 - `ABCArealVariable.ttf`: ABC Areal, used for the interface
 - `ABCArealMonoVariable.ttf`: ABC Areal Mono, used for labels and numbers
